@@ -7,10 +7,10 @@ Daily Cost for Config
 #config = @dy.new_config('web')
 list = @sdb.select("select * from dynamic_usage_configs where ItemName() like '#{@item_name}%'")
 %>Found <%= list[:items].size %> Configurations <%
-configs = list[:items]
 for item in list[:items]
 	config_ary = item.values
 	config = {}
+	# TODO: fix this ugly hack, and fix tabbin
 	for h in config_ary
 		for key in h.keys
 			value = h[key]		
@@ -35,7 +35,7 @@ weekly_optimized_cost,riop = @dy.calc_ri_optimized_price(optimal_RIs,daily_matri
 Optimal Reserved Instances: <%= optimal_RIs %><br />
 <table border=1>
 <tr>
-<center><th>Web</th></center></tr>
+<center><th><%= config[:name] %></th></center></tr>
 <tr>
 <th> Hour: </th>
 <%
@@ -60,11 +60,12 @@ end
 <td><%=count%></td></tr>
 <th>On Demand Price</th>
 <%
-count = 0
+count = 0.0
 for key in daily_matrix.keys.sort
         iu = daily_matrix[key]
         noi = iu[:number_of_instances]
-        od_price = noi * ami_type[:OD_hourly].to_f
+        od_price = noi.to_i * ami_type[:OD_hourly].to_f
+	puts "OD Price = NOI: #{noi} OD_hourly #{ ami_type[:OD_hourly].to_f}  $"
         %><td><%=od_price%></td><%
         count += od_price.to_f
 end
