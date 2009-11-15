@@ -1,0 +1,86 @@
+Daily Cost for Config
+<hr />
+<a href=/>Edit Configs</a><br />
+
+
+<%
+#config = @dy.new_config('web')
+list = @sdb.select("select * from dynamic_usage_configs where ItemName() like '#{@item_name}%'")
+%>Found <%= list[:items].size %> Configurations <%
+configs = list[:items]
+for item in list[:items]
+	config_ary = item.values
+	config = {}
+	for h in config_ary
+		for key in h.keys
+			value = h[key]		
+			puts "key: #{key} #{key.class} valaue: #{value} #{value.class}"
+			config[key.to_sym] = value.to_s
+		end
+	end
+	puts "Class: #{item.class} #{config["type"]} $"
+	#config = @dy.new_config("foo")
+
+ami_types = @dy.get_types
+puts "TYPE!!!!! #{config[:type]} CLASS: #{config[:type].class}"
+ami_type = ami_types[config[:type]]
+if (ami_type == nil)
+	ami_type = ami_types[:m1small]
+end
+daily_matrix = @dy.calc_daily_matrix(config)
+total_instance_hours_per_week = @dy.calc_total_weekly_hours(daily_matrix,config)
+optimal_RIs = @dy.calc_optimal_ri(daily_matrix,total_instance_hours_per_week)
+weekly_optimized_cost,riop = @dy.calc_ri_optimized_price(optimal_RIs,daily_matrix,config)
+%>
+Optimal Reserved Instances: <%= optimal_RIs %><br />
+<table border=1>
+<tr>
+<center><th>Web</th></center></tr>
+<tr>
+<th> Hour: </th>
+<%
+for hour in daily_matrix.keys.sort
+	%><th><%=hour%></th><%
+end
+%>
+<th>Total</th>
+</tr>
+<tr>
+<th>Number of Instances</th>
+<%
+count = 0
+for key in daily_matrix.keys.sort
+	iu = daily_matrix[key]
+	noi = iu[:number_of_instances]
+	usage = iu[:usage]
+	%><td><%=noi%></td><%
+	count += noi.to_i
+end
+%>
+<td><%=count%></td></tr>
+<th>On Demand Price</th>
+<%
+count = 0
+for key in daily_matrix.keys.sort
+        iu = daily_matrix[key]
+        noi = iu[:number_of_instances]
+        od_price = noi * ami_type[:OD_hourly].to_f
+        %><td><%=od_price%></td><%
+        count += od_price.to_f
+end
+%>
+<td><%=count%></td></tr>
+<th>RI Optimized Price</th>
+<%
+count = 0
+for hour in riop.keys.sort
+	rio_price = riop[hour]
+        %><td><%=rio_price%></td><%
+        count += rio_price.to_f
+end
+%>
+<td><%=count%></td></tr>
+</table>
+<%
+end
+%>

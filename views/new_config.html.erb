@@ -1,0 +1,35 @@
+
+Add a new Config
+<hr />
+<form action=new_config/add_config method=post>
+<table>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Metric</th>
+<th>Peak Metric</th>
+<th>Maximum</th>
+<th>Minimum</th>
+<th>Days to run Model</th>
+<th>Off days utilization</th>
+</tr>
+<tr>
+<td><input type=text name=name></td>
+<td>
+<select name=type>
+<%
+ami_types = @dy.get_types
+for type in ami_types.keys
+	%><option value=<%= type %>><%= type %></option> <%	
+end
+%></select>
+</td>
+<td><input type=text name=metric value=5></td>
+<td><input type=text name=peak_metric value=100></td>
+<td><input type=text name=min_q value=0></td>
+<td><input type=text name=max_q value=100></td>
+<td><input type=text name=days_of_week value=7></td>
+<td><input type=text name=weekend_usage value=0></td>
+</table>
+<input type=submit value='add'>
+</form>
