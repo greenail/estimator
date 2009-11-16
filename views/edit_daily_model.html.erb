@@ -7,7 +7,7 @@ Edit Daily Model : TODO need to fix weird hash sort issue
 <%
 hours = []
 usages = []
-@daily_model.each { |key,value| 
+@daily_model.sort.each { |key,value| 
 	next if key == "timezone"
 	hours.push(key)
 	usages.push(value)

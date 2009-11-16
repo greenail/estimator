@@ -60,7 +60,9 @@ def calc_daily_matrix(config)
 		next if hour == "timezone"
 		usage = daily_model[hour]
 		# TODO fix hardcode
-		metric_calculation = (peak_metric / metric * usage.to_f).to_f.round
+		#metric_calculation = ((peak_metric / metric) * usage.to_f).to_f.round
+		metric_calculation = (peak_metric.to_f / metric.to_f * usage.to_f).to_f
+		puts "#{peak_metric} / #{metric} * #{usage.to_f} METRIC_CALCULATION: #{metric_calculation} $"
 		# set number of instances to the config minimum unless the calulation is smaller then the minimum
 		metric_calculation <= minimum.to_i ? number_of_instances = minimum : number_of_instances = metric_calculation
 		#puts "Instances calculated: #{metric_calculation} required for hour: #{hour} - #{number_of_instances}"
@@ -99,6 +101,7 @@ def calc_optimal_ri(daily_matrix,total_instance_hours_per_week)
         end
 	puts "daily_instance_hours  = #{daily_instance_hours} / counter: #{counter}"
 	average_normal_instances = daily_instance_hours / counter
+	return 6
 end
 def calc_ri_optimized_price(optimal_RIs,daily_matrix,config)
 	# TODO: Fix hardcode

@@ -32,6 +32,7 @@ total_instance_hours_per_week = @dy.calc_total_weekly_hours(daily_matrix,config)
 optimal_RIs = @dy.calc_optimal_ri(daily_matrix,total_instance_hours_per_week)
 weekly_optimized_cost,riop = @dy.calc_ri_optimized_price(optimal_RIs,daily_matrix,config)
 %>
+<br />
 Optimal Reserved Instances: <%= optimal_RIs %><br />
 <table border=1>
 <tr>
@@ -58,7 +59,7 @@ for key in daily_matrix.keys.sort
 end
 %>
 <td><%=count%></td></tr>
-<th>On Demand Price</th>
+<th>On Demand Price $<%= ami_type[:OD_hourly].to_f %></th>
 <%
 count = 0.0
 for key in daily_matrix.keys.sort
