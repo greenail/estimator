@@ -56,6 +56,7 @@ def calc_daily_matrix(config)
 	peak_metric = config[:peak_metric]
 	minimum = config[:min_q]
 	metric = config[:metric]
+	max = 0
 	for hour in daily_model.keys
 		next if hour == "timezone"
 		usage = daily_model[hour]
@@ -65,46 +66,55 @@ def calc_daily_matrix(config)
 		puts "#{peak_metric} / #{metric} * #{usage.to_f} METRIC_CALCULATION: #{metric_calculation} $"
 		# set number of instances to the config minimum unless the calulation is smaller then the minimum
 		metric_calculation <= minimum.to_i ? number_of_instances = minimum : number_of_instances = metric_calculation
+		#min = number_of_instances if number_of_instances.to_i < min.to_i
+		max = number_of_instances if number_of_instances.to_i > max.to_i
 		#puts "Instances calculated: #{metric_calculation} required for hour: #{hour} - #{number_of_instances}"
 		ami_type = config[:type]
+		#daily_matrix[hour] = {:usage => usage, :number_of_instances => number_of_instances,:min => minimum, :max => max}
 		daily_matrix[hour] = {:usage => usage, :number_of_instances => number_of_instances}
 	end
-	return daily_matrix
+	return daily_matrix,minimum,max
 end
 def calc_unoptimized_weekly_cost(daily_matrix,config)
 	od_cost = 0.0
-	ami_type = config[:type]
-
+	ami_type = @ami_types[config[:type].to_sym]
 	# normal usage
 	for hour in daily_matrix.keys	
 		number_of_instances = daily_matrix[hour][:number_of_instances].to_i	
-		od_hourly = @ami_types[ami_type][:OD_hourly]
+		od_hourly = ami_type[:OD_hourly]
                 hourly_cost = od_hourly * number_of_instances
                 od_cost += hourly_cost.to_f
 	end	
 	days_of_week = config[:days_of_week]
-	od_cost = od_cost * days_of_week
+	od_cost = od_cost * days_of_week.to_i
 	# weekend usage
-        weekend_days = 7 - days_of_week
-        puts "#{weekend_days.to_i} * #{config[:min_q]} * 24 * #{@ami_types[config[:type]][:OD_hourly]}"
-        weekend_cost = weekend_days.to_i * config[:min_q] * 24 * @ami_types[config[:type]][:OD_hourly]
+        weekend_days = 7 - days_of_week.to_i
+        puts "#{weekend_days.to_i} * #{config[:min_q].to_i} * 24 * #{ami_type[:OD_hourly].to_f}"
+        weekend_cost = weekend_days.to_i * config[:min_q].to_i * 24 * ami_type[:OD_hourly].to_f
         puts "Weekend Cost: #{weekend_cost}"		
 	od_cost += weekend_cost
 end
-def calc_optimal_ri(daily_matrix,total_instance_hours_per_week)
+def calc_optimal_ri(config)
 	# TODO: fix this hack, average is not the optimal, not accounting for weekends
-	counter = 0
-        daily_instance_hours = 0
-	for hour in daily_matrix.keys
-                daily_instance_hours += daily_matrix[hour][:number_of_instances].to_i
-		counter += 1
-        end
-	puts "daily_instance_hours  = #{daily_instance_hours} / counter: #{counter}"
-	average_normal_instances = daily_instance_hours / counter
-	#return 6
+	daily_matrix,min,max = calc_daily_matrix(config)
+	ami_type = @ami_types[config[:type].to_sym]	
+	# run weekly price for range min:max
+	weekly_unoptimized_price = calc_unoptimized_weekly_cost(daily_matrix,config)
+	best_optimized_price = weekly_unoptimized_price * 52
+	best_ri = min
+	# iterate from min to max to find best RI number
+	for i in min.to_i..max.to_i
+		weekly_optimized_price,odm = calc_ri_optimized_price(i,daily_matrix,config)
+		this_optimized_price = weekly_optimized_price * 52 + (ami_type[:RI_y1_install] * i)
+		puts "#{i} RIs--- Comparing #{best_optimized_price} with #{this_optimized_price}"
+		if (this_optimized_price.to_f < best_optimized_price.to_f)
+			best_optimized_price = this_optimized_price
+			best_ri = i
+		end
+	end
+	return best_ri
 end
 def calc_ri_optimized_price(optimal_RIs,daily_matrix,config)
-	# TODO: Fix hardcode
 	daily_instance_hours = 0
 	cost = 0.0
 

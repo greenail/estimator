@@ -82,7 +82,7 @@ class DailyModel < Merb::Controller
   end
   def index
          @dy = DyModel.new
-	@daily_model = @dy.get_daily_usage
+	@daily_model,min,max = @dy.get_daily_usage
     render :edit_daily_model
   end
 end

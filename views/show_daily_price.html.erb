@@ -26,9 +26,9 @@ for item in list[:items]
 ami_types = @dy.get_types
 puts "TYPE!!!!! #{config[:type]} CLASS: #{config[:type].class}"
 ami_type = ami_types[config[:type].to_sym]
-daily_matrix = @dy.calc_daily_matrix(config)
+daily_matrix,min,max = @dy.calc_daily_matrix(config)
 total_instance_hours_per_week = @dy.calc_total_weekly_hours(daily_matrix,config)
-optimal_RIs = @dy.calc_optimal_ri(daily_matrix,total_instance_hours_per_week)
+optimal_RIs = @dy.calc_optimal_ri(config)
 weekly_optimized_cost,riop = @dy.calc_ri_optimized_price(optimal_RIs,daily_matrix,config)
 %>
 <br />
