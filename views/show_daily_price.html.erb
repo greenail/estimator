@@ -1,6 +1,7 @@
 Daily Cost for Config
 <hr />
-<a href=/>Edit Configs</a><br />
+<a href=/>Home</a><br />
+<a href=/configs/edit_daily>Edit Weekday Usage Model</a><br />
 
 Estimate: <%= @index_name %><br />
 <%
@@ -35,7 +36,7 @@ weekly_optimized_cost,riop = @dy.calc_ri_optimized_price(optimal_RIs,daily_matri
 Optimal Reserved Instances: <%= optimal_RIs %><br />
 <table border=1>
 <tr>
-<center><th><a href=<%= URI.escape("/new_config/edit_config?config_key=#{config_key}") %>><%= config[:name] %></a></th></center></tr>
+<center><th><a href=<%= URI.escape("/configs/edit_config?config_key=#{config_key}") %>><%= config[:name] %></a></th></center></tr>
 <tr>
 <th> Hour: </th>
 <%

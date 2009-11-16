@@ -40,7 +40,7 @@ class Estimate  < Merb::Controller
   end
 end
 
-class NewConfig < Merb::Controller
+class Configs < Merb::Controller
 
   def _template_location(action, type = nil, controller = controller_name)
     controller == "layout" ? "layout.#{action}.#{type}" : "#{action}.#{type}"
@@ -73,6 +73,25 @@ class NewConfig < Merb::Controller
 	@name,@config = @dy.get_instance_config(@sdb,@config_name)
 	render :edit_config
   end
+  def edit_daily
+	@dy = DyModel.new
+        @daily_model,min,max = @dy.get_daily_usage
+	render :edit_daily_model
+  end
+  def update_daily_model
+	@dy = DyModel.new
+	@daily_model = {}
+	for name in params.keys
+		if (name =~ /^usage/)
+			nada, hour = name.split("-")
+			print " #{hour}-#{params[name]} "
+			@daily_model[hour] = params[name]	
+		end
+	end
+	#@dy.put_daily_model(@daily_model)
+        #@daily_model,min,max = @dy.get_daily_usage	
+	render :edit_daily_model
+  end
 
 end
 class DailyModel < Merb::Controller
@@ -83,6 +102,6 @@ class DailyModel < Merb::Controller
   def index
          @dy = DyModel.new
 	@daily_model,min,max = @dy.get_daily_usage
-    render :edit_daily_model
+    render :view_daily_model
   end
 end
