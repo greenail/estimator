@@ -10,6 +10,10 @@ end
 def get_default_daily_usage
        model = open('default_daily_usage.yaml') { |f| YAML.load(f) }
 end
+def get_estimates(sdb,user_name)
+	list = sdb.select("select ItemName() from dynamic_usage where ItemName() like '%#{user_name}%'")
+	estimates = list[:items]
+end
 def get_default_monthly_usage
 	model = open('default_monthly_usage.yaml') { |f| YAML.load(f) }
 end
