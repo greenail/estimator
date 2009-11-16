@@ -1,0 +1,27 @@
+Edit Daily Model : TODO need to fix weird hash sort issue
+<%= @daily_model.type %>
+<hr />
+<form action=daily_model/edit method=post>
+<table>
+<tr>
+<%
+hours = []
+usages = []
+@daily_model.sort.each { |key,value| 
+	next if key == "timezone"
+	hours.push(key)
+	usages.push(value)
+	}
+for hour in hours
+	%><th><%=hour%></th><%
+end
+%>
+</tr>
+<tr>
+<%
+for usage in usages
+	%><th><%=usage%></th><%
+end
+%>
+</table>
+</form>

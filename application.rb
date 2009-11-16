@@ -36,6 +36,7 @@ class Estimate  < Merb::Controller
 	key,skey = getCreds()
 	@sdb = RightAws::SdbInterface.new(key,skey)
 	@sdb.put_attributes('dynamic_usage',index_name,"empty")
+	redirect ("/configs/show_daily_price")
     render
   end
 end
@@ -48,6 +49,12 @@ class Configs < Merb::Controller
   def show_daily_price
          @dy = DyModel.new
 	@index_name = cookies[:index_name]
+	@month_start_percentage = params['month_start_percentage']
+	@month_growth_percentage = params['month_growth_percentage']
+	@months = 12
+	if (params['months'])
+		@months = params['months']
+	end
 	 key,skey = getCreds()
         @sdb = RightAws::SdbInterface.new(key,skey)
         render
@@ -62,7 +69,9 @@ class Configs < Merb::Controller
 	@sdb = RightAws::SdbInterface.new(key,skey)
 	name = params['name']
 	@sdb.put_attributes("dynamic_usage_configs","#{@index_name}-#{name}",params,true)
-	render :index
+	#render :index
+	redirect ("/configs/show_daily_price")
+	
   end
   def edit_config
 	@dy = DyModel.new

@@ -1,0 +1,40 @@
+<h1>Edit Instance Configuration</h1>
+<form action=/configs/add_config method=post>
+<table>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Metric</th>
+<th>Peak Metric</th>
+<th>Minimum</th>
+<th>Maximum</th>
+<th>Days to run Model</th>
+<th>Off days utilization</th>
+</tr>
+<tr>
+<td><input type=text name=name value=<%= @config[:name] %>></td>
+<td>
+<select name=type>
+<%
+ami_types = @dy.get_types
+for type in ami_types.keys
+	selected = ""
+	if (type.to_s == @config[:type].to_s)
+		selected = "selected"
+	end
+        %><option value=<%= type %> <%= selected %>><%= type %></option> <%
+end
+%></select>
+</td>
+<td><input type=text name=metric value=<%= @config[:metric] %>></td>
+<td><input type=text name=peak_metric value=<%= @config[:peak_metric] %>></td>
+<td><input type=text name=min_q value=<%= @config[:min_q] %>></td>
+<td><input type=text name=max_q value=<%= @config[:max_q] %>></td>
+<td><input type=text name=days_of_week value=<%= @config[:days_of_week] %>></td>
+<td><input type=text name=weekend_usage value=<%= @config[:weekend_usage] %>></td>
+</table>
+<input type=submit value='add'>
+</form>
+
+
+
