@@ -61,8 +61,17 @@ class NewConfig < Merb::Controller
 	key,skey = getCreds()
 	@sdb = RightAws::SdbInterface.new(key,skey)
 	name = params['name']
-	@sdb.put_attributes("dynamic_usage_configs","#{@index_name}-#{name}",params)
+	@sdb.put_attributes("dynamic_usage_configs","#{@index_name}-#{name}",params,true)
 	render :index
+  end
+  def edit_config
+	@dy = DyModel.new
+	@index_name = cookies[:index_name]
+	key,skey = getCreds()
+        @sdb = RightAws::SdbInterface.new(key,skey)
+	@config_name = params['config_key']
+	@name,@config = @dy.get_instance_config(@sdb,@config_name)
+	render :edit_config
   end
 
 end

@@ -2,23 +2,25 @@ Daily Cost for Config
 <hr />
 <a href=/>Edit Configs</a><br />
 
-
+Estimate: <%= @index_name %><br />
 <%
-#config = @dy.new_config('web')
-list = @sdb.select("select * from dynamic_usage_configs where ItemName() like '#{@item_name}%'")
+puts "select * from dynamic_usage_configs where ItemName() like '#{@index_name}%'"
+list = @sdb.select("select * from dynamic_usage_configs where ItemName() like '#{@index_name}%'")
 %>Found <%= list[:items].size %> Configurations <%
 for item in list[:items]
 	config_ary = item.values
+	config_key = item.keys.to_s
 	config = {}
 	# TODO: fix this ugly hack, and fix tabbin
 	for h in config_ary
 		for key in h.keys
 			value = h[key]		
-			puts "key: #{key} #{key.class} valaue: #{value} #{value.class}"
+			#puts "key: #{key} #{key.class} valaue: #{value} #{value.class}"
 			config[key.to_sym] = value.to_s
 		end
 	end
-	puts "Class: #{item.class} #{config["type"]} $"
+	puts "displaying Config: #{config_key}"
+	#puts "Class: #{item.class} #{config["type"]} $"
 	#config = @dy.new_config("foo")
 
 ami_types = @dy.get_types
@@ -31,33 +33,9 @@ weekly_optimized_cost,riop = @dy.calc_ri_optimized_price(optimal_RIs,daily_matri
 %>
 <br />
 Optimal Reserved Instances: <%= optimal_RIs %><br />
-<img src="http://chart.apis.google.com/chart?chtt=Line+Chart&chts=000000,12&chs=1200x75&chf=bg,s,ffffff|c,s,ffffff&chxt=x,y
-&chxl=0:|00:00|01:00|02:00|03:00|04:00|05:00|06:00|07:00|08:00|09:00|10:00|11:00|12:00|13:00|14:00|15:00|16:00|17:00|18:00|19:00|20:00|21:00|22:00|23:00
-&cht=lc&chd=t:<% 
-first = true
-min = 0
-max = 0
-for key in daily_matrix.keys.sort
-	iu = daily_matrix[key]
-        noi = iu[:number_of_instances]
-	min = noi if noi.to_i < min.to_i
-	max = noi if noi.to_i > max.to_i
-	if (first)
-		%><%= noi %><%
-		first = false
-	else
-		%>,<%= noi %><%
-	end
-end
-%>
-&chdl=Hourly+Instance+Usage
-&chco=0000ff
-&chls=1,1,0
-&chds=<%=min%>,<%=max%>"
-/>
 <table border=1>
 <tr>
-<center><th><%= config[:name] %></th></center></tr>
+<center><th><a href=<%= URI.escape("/new_config/edit_config?config_key=#{config_key}") %>><%= config[:name] %></a></th></center></tr>
 <tr>
 <th> Hour: </th>
 <%
@@ -66,7 +44,7 @@ for hour in daily_matrix.keys.sort
 end
 %>
 <th>Total</th>
-<th>RI 1 Year Cost</th>
+<th>RI 1 Year Up Front Cost</th>
 <th>Total Annual Cost</th>
 </tr>
 <tr>
@@ -89,7 +67,7 @@ for key in daily_matrix.keys.sort
         iu = daily_matrix[key]
         noi = iu[:number_of_instances]
         od_price = noi.to_i * ami_type[:OD_hourly].to_f
-	puts "OD Price = NOI: #{noi} OD_hourly #{ ami_type[:OD_hourly].to_f}  $"
+	#puts "OD Price = NOI: #{noi} OD_hourly #{ ami_type[:OD_hourly].to_f}  $"
         %><td><%=od_price%></td><%
         count += od_price.to_f
 end

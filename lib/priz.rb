@@ -168,4 +168,21 @@ def calc_total_weekly_hours(daily_matrix,config)
 	puts "weekend instances per hour: #{weekend_instances}"
 	return total_instance_hours_per_week
 end
+def get_instance_config(sdb,name)
+	puts "select * from dynamic_usage_configs where ItemName() = '#{name}'"
+	list = sdb.select("select * from dynamic_usage_configs where ItemName() = '#{name}'")
+	list[:items].inspect
+	items = list[:items]
+	h = items[0]
+	name = h.keys[0]
+	bad_config = h.values[0]	
+	config = {}
+	for key in bad_config.keys
+		config[key.to_sym] = bad_config[key].to_s
+	end
+	return name, config
+end
+def delete_instance_config(sdb,name)
+    result = sdb.delete_attributes("dynamic_usage_configs",name) 
+end
 end
