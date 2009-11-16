@@ -57,8 +57,10 @@ class Configs < Merb::Controller
 		@index_name = params['estimate']	
 		cookies[:index_name] = params['estimate']
 	end
-	@month_start_percentage = params['month_start_percentage']
-	@month_growth_percentage = params['month_growth_percentage']
+	@month_start_percentage = 1
+	@month_start_percentage = params['month_start_percentage'] if params['month_start_percentage']
+	@month_growth_percentage = 1	
+	@month_growth_percentage = params['month_growth_percentage'] if params['month_growth_percentage']
 	@months = 12
 	if (params['months'])
 		@months = params['months']

@@ -129,7 +129,7 @@ def calc_ri_optimized_price(optimal_RIs,daily_matrix,config)
 	ami_type = @ami_types[config[:type].to_sym]
         for hour in daily_matrix.keys
                 instances = daily_matrix[hour][:number_of_instances].to_i
-		if (instances > optimal_RIs)
+		if (instances.to_i > optimal_RIs.to_i)
 			od_instances = instances.to_i - optimal_RIs.to_i
 			hour_price = optimal_RIs * ami_type[:RI_hourly].to_f
 			#hour_price += od_instances * @ami_types[config[:type]][:OD_hourly]
