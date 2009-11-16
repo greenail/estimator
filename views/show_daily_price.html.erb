@@ -23,10 +23,7 @@ for item in list[:items]
 
 ami_types = @dy.get_types
 puts "TYPE!!!!! #{config[:type]} CLASS: #{config[:type].class}"
-ami_type = ami_types[config[:type]]
-if (ami_type == nil)
-	ami_type = ami_types[:m1small]
-end
+ami_type = ami_types[config[:type].to_sym]
 daily_matrix = @dy.calc_daily_matrix(config)
 total_instance_hours_per_week = @dy.calc_total_weekly_hours(daily_matrix,config)
 optimal_RIs = @dy.calc_optimal_ri(daily_matrix,total_instance_hours_per_week)
@@ -45,6 +42,8 @@ for hour in daily_matrix.keys.sort
 end
 %>
 <th>Total</th>
+<th>RI 1 Year Cost</th>
+<th>Total Annual Cost</th>
 </tr>
 <tr>
 <th>Number of Instances</th>
@@ -71,17 +70,22 @@ for key in daily_matrix.keys.sort
         count += od_price.to_f
 end
 %>
-<td><%=count%></td></tr>
+<td><%=count%></td>
+<td>$0.00</td><td><%= count * 365 %></td>
+</tr>
 <th>RI Optimized Price</th>
 <%
-count = 0
+count = 0.0
 for hour in riop.keys.sort
 	rio_price = riop[hour]
         %><td><%=rio_price%></td><%
         count += rio_price.to_f
 end
+ri_one_year = ami_type[:RI_y1_install].to_f * optimal_RIs.to_f
 %>
-<td><%=count%></td></tr>
+<td><%=count%></td>
+<td><%= ri_one_year %></td><td><%= (count.to_f * 365) + ri_one_year %></td>
+</tr>
 </table>
 <%
 end

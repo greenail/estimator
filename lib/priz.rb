@@ -101,7 +101,7 @@ def calc_optimal_ri(daily_matrix,total_instance_hours_per_week)
         end
 	puts "daily_instance_hours  = #{daily_instance_hours} / counter: #{counter}"
 	average_normal_instances = daily_instance_hours / counter
-	return 6
+	#return 6
 end
 def calc_ri_optimized_price(optimal_RIs,daily_matrix,config)
 	# TODO: Fix hardcode
