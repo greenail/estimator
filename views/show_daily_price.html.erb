@@ -31,6 +31,30 @@ weekly_optimized_cost,riop = @dy.calc_ri_optimized_price(optimal_RIs,daily_matri
 %>
 <br />
 Optimal Reserved Instances: <%= optimal_RIs %><br />
+<img src="http://chart.apis.google.com/chart?chtt=Line+Chart&chts=000000,12&chs=1200x75&chf=bg,s,ffffff|c,s,ffffff&chxt=x,y
+&chxl=0:|00:00|01:00|02:00|03:00|04:00|05:00|06:00|07:00|08:00|09:00|10:00|11:00|12:00|13:00|14:00|15:00|16:00|17:00|18:00|19:00|20:00|21:00|22:00|23:00
+&cht=lc&chd=t:<% 
+first = true
+min = 0
+max = 0
+for key in daily_matrix.keys.sort
+	iu = daily_matrix[key]
+        noi = iu[:number_of_instances]
+	min = noi if noi.to_i < min.to_i
+	max = noi if noi.to_i > max.to_i
+	if (first)
+		%><%= noi %><%
+		first = false
+	else
+		%>,<%= noi %><%
+	end
+end
+%>
+&chdl=Hourly+Instance+Usage
+&chco=0000ff
+&chls=1,1,0
+&chds=<%=min%>,<%=max%>"
+/>
 <table border=1>
 <tr>
 <center><th><%= config[:name] %></th></center></tr>

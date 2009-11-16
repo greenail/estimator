@@ -5,32 +5,32 @@
   :RI_hourly: 0.03
   :OD_hourly: 0.085
 :m1large:
-  :RI_y1_install: 227
-  :RI_y2_install: 350
-  :RI_hourly: 0.3
-  :OD_hourly: 0.085
+  :RI_y1_install: 910
+  :RI_y2_install: 1400
+  :RI_hourly: 0.12
+  :OD_hourly: 0.34
 :m1xl:
-  :RI_y1_install: 227
-  :RI_y2_install: 350
-  :RI_hourly: 0.3
-  :OD_hourly: 0.085
+  :RI_y1_install: 1820
+  :RI_y2_install: 2800
+  :RI_hourly: 0.24
+  :OD_hourly: 0.68
 :m2dxl:
-  :RI_y1_install: 227
-  :RI_y2_install: 350
-  :RI_hourly: 0.3
-  :OD_hourly: 0.085
+  :RI_y1_install: 3185
+  :RI_y2_install: 4900
+  :RI_hourly: 0.42
+  :OD_hourly: 1.2
 :m2qxl:
-  :RI_y1_install: 227
-  :RI_y2_install: 350
-  :RI_hourly: 0.3
-  :OD_hourly: 0.085
+  :RI_y1_install: 6370
+  :RI_y2_install: 9800
+  :RI_hourly: 0.84
+  :OD_hourly: 2.4
 :c1medium:
-  :RI_y1_install: 227
-  :RI_y2_install: 350
-  :RI_hourly: 0.3
-  :OD_hourly: 0.085
+  :RI_y1_install: 455
+  :RI_y2_install: 700
+  :RI_hourly: 0.06
+  :OD_hourly: .17
 :c1xl:
-  :RI_y1_install: 227
-  :RI_y2_install: 350
-  :RI_hourly: 0.3
-  :OD_hourly: 0.085
+  :RI_y1_install: 1820
+  :RI_y2_install: 2800
+  :RI_hourly: 0.24
+  :OD_hourly: .68
