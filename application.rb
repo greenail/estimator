@@ -67,6 +67,7 @@ class Configs < Merb::Controller
     controller == "layout" ? "layout.#{action}.#{type}" : "#{action}.#{type}"
   end
   def show_daily_price
+	# this is depricated
         @dy = DyModel.new
 	@index_name = cookies[:index_name]
 	if (params['estimate'])

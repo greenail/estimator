@@ -182,7 +182,15 @@ def calc_total_weekly_hours(daily_matrix,config)
 	puts "weekend instances per hour: #{weekend_instances}"
 	return total_instance_hours_per_week
 end
-def get_instance_config(sdb,name)
+def get_instance_configs(sdb,estimate_name)
+	configs = {}
+	list = @sdb.select("select * from dynamic_usage_configs where ItemName() like '#{@estimate_name}%'")	
+	items = list[:items]
+	for item in items
+		
+	end
+end
+def get_instance_config(sdb,config_name)
 	puts "select * from dynamic_usage_configs where ItemName() = '#{name}'"
 	list = sdb.select("select * from dynamic_usage_configs where ItemName() = '#{name}'")
 	list[:items].inspect

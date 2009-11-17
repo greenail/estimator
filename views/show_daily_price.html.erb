@@ -1,11 +1,17 @@
 <%= partial( "header" ) %>
-<h2>Daily Cost for Config</h2>
-<form action=/configs/show_daily_price method=post>
-Months to estimate: <%= @months %><br />
-Month 1 Utilization: <input type=text size=3 name=month_start_percentage value=<%= @month_start_percentage %>><br />
-Monthly Growth Rate: <input type=text size=3 name=month_growth_percentage value=<%= @month_growth_percentage %>><br />
-<input type=submit value="Update Monthly Parameters">
-</form>
+
+<h2>Dynamic Costs for Configuration</h2>
+<table spacing=20>
+<tr>
+<td>
+<a href=/configs/edit_daily>Edit Weekday Usage Model</a><br />
+<a href=/configs>Add Instance Configuration</a><br />
+</td>
+<td>
+<%= partial("monthly_config") %>
+</td>
+</tr>
+</table>
 
 <%
 # holy fuck this is ugly
