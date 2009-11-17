@@ -1,10 +1,5 @@
-Daily Cost for Config
-<hr />
-<a href=/>Home</a><br />
-<a href=/configs/edit_daily>Edit Weekday Usage Model</a><br />
-<a href=/configs>Add Instance Configuration</a><br />
-
-Estimate: <%= @index_name %><br />
+<%= partial( "header" ) %>
+<h2>Daily Cost for Config</h2>
 <form action=/configs/show_daily_price method=post>
 Months to estimate: <%= @months %><br />
 Month 1 Utilization: <input type=text size=3 name=month_start_percentage value=<%= @month_start_percentage %>><br />

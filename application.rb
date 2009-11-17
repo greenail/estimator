@@ -10,12 +10,28 @@ class Priz < Merb::Controller
 
   def index
 	@user_name = cookies[:user_name]
+	if (params['user_name'] != nil)
+		@user_name = params['user_name'] 
+		puts "LOGIN: #{@user_name}"
+		cookies[:user_name] = @user_name
+	end
+	if (@user_name == nil)
+		redirect("/priz/login")
+	end	
 	@index_name = cookies[:index_name]
 	@dy = DyModel.new
 	key,skey = getCreds()
         @sdb = RightAws::SdbInterface.new(key,skey)
 	@estimates = @dy.get_estimates(@sdb,@user_name)
-    render
+    	render
+  end
+  def login
+	render
+  end
+  def logout
+	#cookies.delete[:user_name]
+	cookies.delete(:user_name)
+	redirect("/priz/login")
   end
 
   
@@ -51,7 +67,7 @@ class Configs < Merb::Controller
     controller == "layout" ? "layout.#{action}.#{type}" : "#{action}.#{type}"
   end
   def show_daily_price
-         @dy = DyModel.new
+        @dy = DyModel.new
 	@index_name = cookies[:index_name]
 	if (params['estimate'])
 		@index_name = params['estimate']	
@@ -66,6 +82,25 @@ class Configs < Merb::Controller
 		@months = params['months']
 	end
 	 key,skey = getCreds()
+        @sdb = RightAws::SdbInterface.new(key,skey)
+        render
+  end
+  def show_estimate
+        @dy = DyModel.new
+        @index_name = cookies[:index_name]
+        if (params['estimate'])
+                @index_name = params['estimate']
+                cookies[:index_name] = params['estimate']
+        end
+        @month_start_percentage = 0.2
+        @month_start_percentage = params['month_start_percentage'] if params['month_start_percentage']
+        @month_growth_percentage = 0.16
+        @month_growth_percentage = params['month_growth_percentage'] if params['month_growth_percentage']
+        @months = 12
+        if (params['months'])
+                @months = params['months']
+        end
+        key,skey = getCreds()
         @sdb = RightAws::SdbInterface.new(key,skey)
         render
   end

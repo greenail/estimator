@@ -1,0 +1,21 @@
+<h1>Dynamic Scaling Estimator</h1>
+<table>
+<tr>
+<th>Welcome: <%= cookies[:user_name] %></th>
+<%
+if (cookies[:user_name] == nil || params['user_name'] == nil)
+        #redirect("/priz/login")
+	puts "REDIRECT"
+end
+
+if (@index_name != nil || params['estimate'] != nil)
+        %>
+        <th>Working on Estimate: <a href=/configs/show_daily_price><%= @index_name %></a></th>
+        <%
+end
+%>
+<tr>
+<th><a href=/>Home</a></th><th><a href=/estimate>New Estimate</a></th>
+<th><a href=/priz/logout>Logout</a></th>
+</tr>
+<table>

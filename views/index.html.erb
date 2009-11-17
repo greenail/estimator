@@ -1,23 +1,11 @@
-Welcome: <%= @user_name %><br>
-<%
-if (@index_name != nil)
-	%>
-	Working on Estimate: <a href=/configs/show_daily_price><%= @index_name %></a><br>
-	<%
-end
-%>
-<br />
-<a href=/daily_model>View Default Daily Model</a>
-<br />
-<a href=/estimate>Start a new Estimate</a>
-<br />
+<%= partial( "header" ) %>
 <hr>
 <br>
 <%
 
 for key in @estimates
 	estimate_name = key.to_s
-	%><a href=/configs/show_daily_price?estimate=<%= estimate_name %>><%= estimate_name %><br></a><%
+	%><a href=/configs/show_estimate?estimate=<%= estimate_name %>><%= estimate_name %><br></a><%
 end
 
 %>
