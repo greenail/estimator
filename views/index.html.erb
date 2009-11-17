@@ -2,8 +2,8 @@
 <hr>
 <br>
 <%
-for key in @estimates
-	estimate_name = key.to_s
-	%><a href=/configs/show_daily_price?estimate=<%= estimate_name %>><%= estimate_name %><br></a><%
+for e in @estimates
+	estimate_name = e.name
+	%><a href=/configs/show_estimate?estimate=<%= estimate_name %>><%= estimate_name %><br></a><%
 end
 %>

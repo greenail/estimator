@@ -1,6 +1,7 @@
 # Go to http://wiki.merbivore.com/pages/init-rb
 
 #  use_orm :none
+use_orm :datamapper
 use_test :rspec
 use_template_engine :erb
 

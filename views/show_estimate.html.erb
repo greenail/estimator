@@ -12,3 +12,11 @@
 </td>
 </tr>
 </table>
+
+<%
+for config in @configs
+	%><%= config.name%><br />
+	<%= partial("config",:with => config) %>
+	<%
+end
+%>

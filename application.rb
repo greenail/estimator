@@ -19,10 +19,10 @@ class Priz < Merb::Controller
 		redirect("/priz/login")
 	end	
 	@index_name = cookies[:index_name]
-	@dy = DyModel.new
-	key,skey = getCreds()
-        @sdb = RightAws::SdbInterface.new(key,skey)
-	@estimates = @dy.get_estimates(@sdb,@user_name)
+	#@dy = DyModel.new
+	#key,skey = getCreds()
+        #@sdb = RightAws::SdbInterface.new(key,skey)
+	@estimates = EstimateModel.all
     	render
   end
   def login
@@ -53,10 +53,11 @@ class Estimate  < Merb::Controller
         index_name = "#{user_name}-#{customer_name}-#{quote_name}"
 	cookies[:user_name] = user_name
 	cookies[:index_name] = index_name
-	key,skey = getCreds()
-	@sdb = RightAws::SdbInterface.new(key,skey)
-	@sdb.put_attributes('dynamic_usage',index_name,"empty")
-	redirect ("/configs/show_daily_price")
+	estimate = EstimateModel.create(:name => index_name,:months => "12")
+	#key,skey = getCreds()
+	#@sdb = RightAws::SdbInterface.new(key,skey)
+	#@sdb.put_attributes('dynamic_usage',index_name,"empty")
+	redirect ("/configs/show_estimate")
     #render
   end
 end
@@ -101,20 +102,22 @@ class Configs < Merb::Controller
         if (params['months'])
                 @months = params['months']
         end
-        key,skey = getCreds()
-        @sdb = RightAws::SdbInterface.new(key,skey)
+        #key,skey = getCreds()
+        #@sdb = RightAws::SdbInterface.new(key,skey)
+	@configs = Iconf.all(:name.like => "#{@index_name}%")
         render
   end
   def index
-	 @dy = DyModel.new
-    render :new_config
+ 	@dy = DyModel.new
+    	render :new_config
   end
   def add_config
 	@index_name = cookies[:index_name]
-	key,skey = getCreds()
-	@sdb = RightAws::SdbInterface.new(key,skey)
+	#key,skey = getCreds()
+	#@sdb = RightAws::SdbInterface.new(key,skey)
 	name = params['name']
-	@sdb.put_attributes("dynamic_usage_configs","#{@index_name}-#{name}",params,true)
+	#@sdb.put_attributes("dynamic_usage_configs","#{@index_name}-#{name}",params,true)
+	ic = Iconf.create(:name => "#{@index_name}-#{name}",:type => params['type'],:min_q => params['min_q'],:max_q => params['max_q'],:days => params['days'],:weekend_usage => params['weekend_usage'])
 	#render :index
 	redirect ("/configs/show_daily_price")
 	
@@ -159,4 +162,34 @@ class DailyModel < Merb::Controller
 	@daily_model,min,max = @dy.get_daily_usage
     render :view_daily_model
   end
+end
+class EstimateModel
+	include DataMapper::Resource
+	property :id,Serial
+	property :name, String, :nullable => false
+	property :months, Integer, :nullable => false
+	# configs is a hash of config names
+	property :configs, Object
+end
+class Iconf
+	# this is the instance configuration
+	include DataMapper::Resource
+        property :id,Serial
+	property :name, String, :nullable => false	
+	property :type, String, :nullable => false
+        property :min_q, String, :nullable => false
+        property :max_q, String, :nullable => false
+        property :days, String, :nullable => false
+        property :weekend_usage, String, :nullable => false
+	#property :config, Object
+	def to_hash
+		t = {}
+		t[:type] = @type
+		t[:name] = @name
+		t[:min_q] = @min_q
+		t[:max_q] = @max_q
+		t[:days_of_week] = @days
+		t[:weekend_usage] = @weekend_usage
+		return t
+	end
 end

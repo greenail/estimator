@@ -39,9 +39,10 @@ end
 def get_types
 	@ami_types = open('ami_types.yaml') { |f| YAML.load(f) }
 end
-def new_config(name)
-	@configs[name] = {:type => :m1small, :min_q => 2,:max_q => 50,:metric => 50,:days_of_week => 5,:weekend_usage => 0.1,:peak_metric => 50}	
-end
+# moved to datamapper
+#def new_config(name)
+	#@configs[name] = {:type => :m1small, :min_q => 2,:max_q => 50,:metric => 50,:days_of_week => 5,:weekend_usage => 0.1,:peak_metric => 50}	
+#end
 def calc_monthly_optimized_cost(config)
 	daily_matrix = calc_daily_matrix(config)
 	total_instance_hours_per_week = calc_total_weekly_hours(daily_matrix,config)
@@ -57,24 +58,18 @@ def calc_daily_matrix(config)
 	daily_model = get_daily_usage	
 	daily_matrix = {}
 	# TODO fix below
-	peak_metric = config[:peak_metric]
 	minimum = config[:min_q]
-	metric = config[:metric]
-	max = 0
+	max_q = config[:max_q]
 	for hour in daily_model.keys
 		next if hour == "timezone"
 		usage = daily_model[hour]
 		# TODO fix hardcode
-		#metric_calculation = ((peak_metric / metric) * usage.to_f).to_f.round
-		metric_calculation = (peak_metric.to_f / metric.to_f * usage.to_f).to_f
-		puts "#{peak_metric} / #{metric} * #{usage.to_f} METRIC_CALCULATION: #{metric_calculation} $"
+		metric_calculation = (max_q.to_f * usage.to_f).to_f
+		#puts "#{peak_metric} / #{metric} * #{usage.to_f} METRIC_CALCULATION: #{metric_calculation} $"
 		# set number of instances to the config minimum unless the calulation is smaller then the minimum
 		metric_calculation <= minimum.to_i ? number_of_instances = minimum : number_of_instances = metric_calculation
-		#min = number_of_instances if number_of_instances.to_i < min.to_i
 		max = number_of_instances if number_of_instances.to_i > max.to_i
-		#puts "Instances calculated: #{metric_calculation} required for hour: #{hour} - #{number_of_instances}"
 		ami_type = config[:type]
-		#daily_matrix[hour] = {:usage => usage, :number_of_instances => number_of_instances,:min => minimum, :max => max}
 		daily_matrix[hour] = {:usage => usage, :number_of_instances => number_of_instances}
 	end
 	return daily_matrix,minimum,max
@@ -99,7 +94,7 @@ def calc_unoptimized_weekly_cost(daily_matrix,config)
 	od_cost += weekend_cost
 end
 def calc_optimal_ri(config)
-	# TODO: fix this hack, average is not the optimal, not accounting for weekends
+	# TODO: need to validate math and setup tests 
 	daily_matrix,min,max = calc_daily_matrix(config)
 	ami_type = @ami_types[config[:type].to_sym]	
 	# run weekly price for range min:max
