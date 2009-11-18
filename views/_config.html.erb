@@ -20,7 +20,14 @@ weekly_optimized_cost,riop = @dy.calc_ri_optimized_price(optimal_RIs,daily_matri
 Optimal Reserved Instances: <%= optimal_RIs %><br />
 <table border=1>
 <tr>
-<center><th><a href=<%= URI.escape("/configs/edit_config?config_key=#{config.name}") %>><%= config.name %></a></th></center></tr>
+<center><th colspan=10><%= config.name %>
+	 <a href=<%= URI.escape("/configs/edit_config?config_key=#{config.name}") %>>
+	 Edit --- 
+	</a>
+	<a href="/configs/delete_config?config_key=<%= config.name %>">
+	Delete
+	</a>
+</th></center></tr>
 <tr>
 <th> Hour: </th>
 <%

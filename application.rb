@@ -113,22 +113,38 @@ class Configs < Merb::Controller
   end
   def add_config
 	@index_name = cookies[:index_name]
-	#key,skey = getCreds()
-	#@sdb = RightAws::SdbInterface.new(key,skey)
 	name = params['name']
-	#@sdb.put_attributes("dynamic_usage_configs","#{@index_name}-#{name}",params,true)
 	ic = Iconf.create(:name => "#{@index_name}-#{name}",:type => params['type'],:min_q => params['min_q'],:max_q => params['max_q'],:days => params['days'],:weekend_usage => params['weekend_usage'])
-	#render :index
-	redirect ("/configs/show_daily_price")
-	
+	redirect ("/configs/show_estimate")
+  end
+  def update_config
+	@index_name = cookies[:index_name]
+        name = params['name']
+	ic = Iconf.first(:name => name)
+        #ic.update(:name => name,:type => params['type'],:min_q => params['min_q'],:max_q => params['max_q'],:days => params['days'],:weekend_usage => params['weekend_usage'])
+	#ic.type = params['type']
+	#ic.min_q =  params['min_q']
+	#ic.max_q = params['max_q']
+	ic.days = params['days']
+	#ic.weekend_usage = params['weekend_usage']
+	result = ic.save
+	puts "DAYS: #{params['days']} Result: #{result}"
+        #redirect ("/configs/show_estimate")
+  end
+  def delete_config
+	ic = Iconf.first(:name => params['config_key'])
+	ic.destroy
+	redirect ("/configs/show_estimate")
   end
   def edit_config
 	@dy = DyModel.new
 	@index_name = cookies[:index_name]
 	key,skey = getCreds()
-        @sdb = RightAws::SdbInterface.new(key,skey)
+        #@sdb = RightAws::SdbInterface.new(key,skey)
 	@config_name = params['config_key']
-	@name,@config = @dy.get_instance_config(@sdb,@config_name)
+	#@name,@config = @dy.get_instance_config(@sdb,@config_name)
+	@c = Iconf.first(:name =>@config_name)
+	@config = @c.to_hash
 	render :edit_config
   end
   def edit_daily
