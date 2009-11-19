@@ -1,0 +1,23 @@
+<hr />
+<table border=1>
+<tr>
+<%
+hours = []
+usages = []
+@daily_model.sort.each { |key,value| 
+	next if key == "timezone"
+	hours.push(key)
+	usages.push(value)
+	}
+for hour in hours
+	%><th><%=hour%></th><%
+end
+%>
+</tr>
+<tr>
+<%
+for usage in usages
+	%><th><%=usage%></th><%
+end
+%>
+</table>
