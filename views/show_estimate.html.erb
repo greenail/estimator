@@ -12,11 +12,28 @@
 </td>
 </tr>
 </table>
+<% 
+for month in 1..@months.to_i
+	@usage = @month_start_percentage.to_f + (@month_start_percentage.to_f * @month_growth_percentage.to_f * month.to_i)
+	@usage = 1 if (@usage >= 1 )
+	puts "USAGE: #{@usage} #{@month_start_percentage} * (#{@month_start_percentage} * #{@month_growth_percentage} #{month})"
+	@daily_model = @dy.get_daily_usage(@usage)
+	%><b>Month <%= month %></b><br/>
+	<%=partial ("view_daily_model") %>
+	<%
+	for config in @configs
+        	%><%= config.name%><br />
+        	<%= partial("config",:with => config) %>
+        	<%
+	end
+	
+end
+%>
 
 <%
-for config in @configs
-	%><%= config.name%><br />
-	<%= partial("config",:with => config) %>
-	<%
-end
+#for config in @configs
+	#%><%= config.name%><br />
+	#<%= partial("config",:with => config) %>
+	#<%
+#end
 %>

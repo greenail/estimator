@@ -51,12 +51,10 @@ class Estimate  < Merb::Controller
         customer_name = params['customer_name']
         quote_name =  params['quote_name']
         index_name = "#{user_name}-#{customer_name}-#{quote_name}"
+	months = params['months']
 	cookies[:user_name] = user_name
 	cookies[:index_name] = index_name
-	estimate = EstimateModel.create(:name => index_name,:months => "12")
-	#key,skey = getCreds()
-	#@sdb = RightAws::SdbInterface.new(key,skey)
-	#@sdb.put_attributes('dynamic_usage',index_name,"empty")
+	@estimate = EstimateModel.create(:name => index_name,:months => months)
 	redirect ("/configs/show_estimate")
     #render
   end
@@ -67,26 +65,6 @@ class Configs < Merb::Controller
   def _template_location(action, type = nil, controller = controller_name)
     controller == "layout" ? "layout.#{action}.#{type}" : "#{action}.#{type}"
   end
-  def show_daily_price
-	# this is depricated
-        @dy = DyModel.new
-	@index_name = cookies[:index_name]
-	if (params['estimate'])
-		@index_name = params['estimate']	
-		cookies[:index_name] = params['estimate']
-	end
-	@month_start_percentage = 1
-	@month_start_percentage = params['month_start_percentage'] if params['month_start_percentage']
-	@month_growth_percentage = 1	
-	@month_growth_percentage = params['month_growth_percentage'] if params['month_growth_percentage']
-	@months = 12
-	if (params['months'])
-		@months = params['months']
-	end
-	 key,skey = getCreds()
-        @sdb = RightAws::SdbInterface.new(key,skey)
-        render
-  end
   def show_estimate
         @dy = DyModel.new
         @index_name = cookies[:index_name]
@@ -94,16 +72,18 @@ class Configs < Merb::Controller
                 @index_name = params['estimate']
                 cookies[:index_name] = params['estimate']
         end
-        @month_start_percentage = 0.2
+        @month_start_percentage = 0.5
         @month_start_percentage = params['month_start_percentage'] if params['month_start_percentage']
         @month_growth_percentage = 0.16
         @month_growth_percentage = params['month_growth_percentage'] if params['month_growth_percentage']
-        @months = 12
-        if (params['months'])
+	@estimate = EstimateModel.first(:name => @index_name)
+	if (params['months'])
                 @months = params['months']
+                @estimate.months = @months
+                @estimate.save
+        else
+                @months = @estimate.months
         end
-        #key,skey = getCreds()
-        #@sdb = RightAws::SdbInterface.new(key,skey)
 	@configs = Iconf.all(:name.like => "#{@index_name}%")
         render
   end
@@ -149,7 +129,8 @@ class Configs < Merb::Controller
   end
   def edit_daily
 	@dy = DyModel.new
-        @daily_model,min,max = @dy.get_daily_usage
+	@usage = params['usage']
+        @daily_model,min,max = @dy.get_daily_usage(@usage)
 	render :edit_daily_model
   end
   def update_daily_model
@@ -175,7 +156,8 @@ class DailyModel < Merb::Controller
   end
   def index
          @dy = DyModel.new
-	@daily_model,min,max = @dy.get_daily_usage
+	@usage = params['usage']
+	@daily_model,min,max = @dy.get_daily_usage(@usage)
     render :view_daily_model
   end
 end

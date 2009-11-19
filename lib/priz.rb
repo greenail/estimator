@@ -25,13 +25,18 @@ def get_monthly_usage
                 model = get_default_daily_usage
         end
 end
-def get_daily_usage
+def get_daily_usage(usage)
 	fname = 'daily_usage.yaml'
 	if (File.exist?(fname))
 		model = open(fname) { |f| YAML.load(f) }	
 	else
 		model = get_default_daily_usage
 	end
+	for hour in model.keys
+		hourly_usage = model[hour]
+		model[hour] = hourly_usage.to_f * usage.to_f
+	end
+	return model
 end
 def save_daily_usage
 	open('daily_usage.yaml', 'w') { |f| YAML.dump(model, f) }	
@@ -53,9 +58,9 @@ def calc_monthly_optimized_cost(config)
 	savings = weekly_unoptimized_price.to_f - weekly_optimized_price.to_f
 	puts "Optimized Weekly Price: #{weekly_optimized_price} Unoptimized Weekly Price #{weekly_unoptimized_price} Savings: #{savings}"
 end
-def calc_daily_matrix(config)
+def calc_daily_matrix(config, usage)
 	ami_type = config[:type]
-	daily_model = get_daily_usage	
+	daily_model = get_daily_usage(usage)
 	daily_matrix = {}
 	# TODO fix below
 	minimum = config[:min_q]
@@ -93,9 +98,9 @@ def calc_unoptimized_weekly_cost(daily_matrix,config)
         puts "Weekend Cost: #{weekend_cost}"		
 	od_cost += weekend_cost
 end
-def calc_optimal_ri(config)
+def calc_optimal_ri(config, usage)
 	# TODO: need to validate math and setup tests 
-	daily_matrix,min,max = calc_daily_matrix(config)
+	daily_matrix,min,max = calc_daily_matrix(config,usage)
 	ami_type = @ami_types[config[:type].to_sym]	
 	# run weekly price for range min:max
 	weekly_unoptimized_price = calc_unoptimized_weekly_cost(daily_matrix,config)

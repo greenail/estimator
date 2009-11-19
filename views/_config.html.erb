@@ -12,8 +12,8 @@ config_hash = config.to_hash
 ami_types = @dy.get_types
 ami_type = ami_types[config.type.to_sym]
 puts "AMITYPE: #{ami_type}"
-daily_matrix,min,max = @dy.calc_daily_matrix(config)
-optimal_RIs = @dy.calc_optimal_ri(config_hash)
+daily_matrix,min,max = @dy.calc_daily_matrix(config,@usage)
+optimal_RIs = @dy.calc_optimal_ri(config_hash,@usage)
 weekly_optimized_cost,riop = @dy.calc_ri_optimized_price(optimal_RIs,daily_matrix,config_hash)
 %>
 <br />
