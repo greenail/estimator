@@ -89,10 +89,5 @@ ri_optimized_project_cost +=  ri_one_year + (count.to_f * 365)
 <td><%= ri_one_year %></td><td><%= (count.to_f * 365) + ri_one_year %></td>
 </tr>
 </table>
-<h1>Totals with no Monthly Scaling</h1>
-Total Unoptimized cost: <%= od_no_scale_project_cost %><br />
-Total Auto Scaling Unoptimized cost: <%= od_project_cost %><br />
-Total Optimized cost: <%= ri_optimized_project_cost %><br />
-Total Savings for RI Optimization and Auto Scaling: <%= od_no_scale_project_cost.to_f - ri_optimized_project_cost.to_f%><br />
-Total RI Upfront Payment: <%= total_ri_upfront %><br />
+Config RI Upfront Payment: <%= total_ri_upfront %><br />
 <br>
