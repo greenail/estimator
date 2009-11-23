@@ -101,15 +101,9 @@ class Configs < Merb::Controller
 	@index_name = cookies[:index_name]
         name = params['name']
 	ic = Iconf.first(:name => name)
-        #ic.update(:name => name,:type => params['type'],:min_q => params['min_q'],:max_q => params['max_q'],:days => params['days'],:weekend_usage => params['weekend_usage'])
-	#ic.type = params['type']
-	#ic.min_q =  params['min_q']
-	#ic.max_q = params['max_q']
-	ic.days = params['days']
-	#ic.weekend_usage = params['weekend_usage']
-	result = ic.save
-	puts "DAYS: #{params['days']} Result: #{result}"
-        #redirect ("/configs/show_estimate")
+        ic.update(:name => name,:type => params['type'],:min_q => params['min_q'],:max_q => params['max_q'],:days => params['days'],:weekend_usage => params['weekend_usage'])
+	#puts "DAYS: #{params['days']} Result: #{result}"
+        redirect ("/configs/show_estimate")
   end
   def delete_config
 	ic = Iconf.first(:name => params['config_key'])
