@@ -1,5 +1,5 @@
+<%= partial( "header" ) %>
 Edit Daily Model 
-<%= @daily_model.type %>
 <hr />
 <form action=/configs/update_daily_model method=post>
 <table border=1 padding=1>
@@ -9,12 +9,12 @@ Edit Daily Model
 <%
 hours = []
 usages = []
-@daily_model.sort.each { |key,value| 
-	next if key == "timezone"
-	puts "VALUE #{value} #{@daily_model[key]}"
+h = YAML::load(@dm.yaml)
+h.sort.each { |hour,usage| 
+	#puts "VALUE #{value} #{@daily_model[key]}"
 	%>
-	<td><%=key%></td>
-	<td><input type=text size=3 name=<%= "usage-#{key}" %> value=<%=value%>></td>
+	<td><%=hour%></td>
+	<td><input type=text size=3 name=<%= "usage-#{hour}" %> value=<%=usage%>></td>
 	</tr>
 	<%
 	}

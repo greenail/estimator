@@ -7,7 +7,7 @@ class DailyModel
         property :id,Serial
         property :name, String, :nullable => false
         property :yaml, String, :nullable => false
- 	attr_accessor :usage,:max_instances,:model_min,:day,:ami_type,:model_max,:ami_types,:instance_hours,:weekend_days,:weekend_usage,:ri_one_time
+ 	attr_accessor :usage,:max_instances,:model_min,:day,:ami_type,:model_max,:ami_types,:instance_hours,:weekend_days,:weekend_usage,:ri_one_time,:temp_hash
 		
 
 	# TODO: put timezone in monthly model, not sure if needed
@@ -22,6 +22,17 @@ class DailyModel
 	end
 	def get_types
        		@ami_types = open('ami_types.yaml') { |f| YAML.load(f) }
+	end
+	def put_hour(hour,usage)
+		if (@temp_hash == nil)
+			@temp_hash = YAML::load(@yaml)
+		end
+		@temp_hash[hour.to_i] = usage.to_i
+	end
+	def save_yaml
+		@yaml = @temp_hash.to_yaml
+		puts "SAVE_YAML: #{@yaml}"
+		self.save
 	end
 	def get_daily_model(ami_type,usage = 1,model_min = 0,model_max = 1)
 		@ami_types = get_types

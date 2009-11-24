@@ -127,33 +127,24 @@ class Configs < Merb::Controller
 	render :edit_config
   end
   def edit_daily
-	@dy = DyModel.new
 	@estimate_name = cookies[:estimate_name]
-	#@usage = params['usage']
 	@usage = 1
-	dm = DailyModel.first(:name => "#{@estimate_name}-DailyModel")
-	if (dm == nil)
-		puts "Using Default Daily Model"
-        	@daily_model,min,max = @dy.get_daily_usage(@usage)
-	else
-		puts "Using SDB Model"
-		@daily_model = dm.config
-	end
-
+	puts "#{@estimate_name}-DailyModel"
+	@dm = JS::DailyModel.first(:name => "#{@estimate_name}-DailyModel")
 	render :edit_daily_model
   end
   def update_daily_model
-	@dy = DyModel.new
-	@daily_model = {}
-	for name in params.keys
+	@estimate_name = cookies[:estimate_name]
+	@dm = JS::DailyModel.first(:name => "#{@estimate_name}-DailyModel")
+	for name in params.keys.sort
 		if (name =~ /^usage/)
 			nada, hour = name.split("-")
 			print " #{hour}-#{params[name]} "
-			@daily_model[hour] = params[name]	
+			@dm.put_hour(hour,params[name])
 		end
 	end
-	@estimate_name = cookies[:estimate_name]
-	dm = DailyModel.create(:name => "#{@estimate_name}-DailyModel",:yaml => @daily_model.to_yaml)
+	@dm.save_yaml
+	@dm.save
 	redirect ("/configs/show_estimate")
 	
   end

@@ -75,6 +75,14 @@ def test_optimal_ris
 	optimal_ris = dm.calc_optimal_ris
         assert_equal(1,optimal_ris, "testing optimal RI calculation should =1 for min = 0,max = 2")
 end
+def test_save_daily_model
+	dm = JS::DailyModel.first(:name => "test_get_daily_model")
+	dm.put_hour(0,1)
+	dm.save_yaml
+	dm.get_daily_model("m1small")
+	usage = dm.day[0].usage
+	assert_equal(1,usage,"testing put_hour method")
+end
 def test_destroy_dm_object
 	dm = JS::DailyModel.first(:name => "test_get_daily_model")
 	assert_not_nil(dm,"Testing if get pulls an object")

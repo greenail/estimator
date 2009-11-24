@@ -9,5 +9,14 @@ dm.weekend_days = 7 - config.days.to_i
 # TODO:  want to put the config once per iteration instead of all this crap
 #dm.put_config(config)
 optimal_ris = dm.calc_optimal_ris
+rio_price,first_month_price = dm.calc_annual_price_with_ri(optimal_ris)
+# TODO: need to figure out difference between previous month's RI purchase if we add an RI.
+# 	Need to add a Monthly Total sans RI one time
+#	Need to add Project Total
+#  	Need to reduce calls to SimpleDB
 %>
 Optimal Reserved Instances: <%= optimal_ris %><br />
+First Month Cost: <%= first_month_price %><br />
+
+
+
