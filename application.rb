@@ -1,4 +1,5 @@
-require 'lib/priz.rb'
+#require 'lib/priz.rb'
+require 'lib/dailymodel.rb'
 require '/root/creds.rb'
 require 'right_aws'
 
@@ -18,7 +19,7 @@ class Priz < Merb::Controller
 	if (@user_name == nil)
 		redirect("/priz/login")
 	end	
-	@index_name = cookies[:index_name]
+	@estimate_name = cookies[:estimate_name]
 	#@dy = DyModel.new
 	#key,skey = getCreds()
         #@sdb = RightAws::SdbInterface.new(key,skey)
@@ -50,13 +51,17 @@ class Estimate  < Merb::Controller
 	user_name = params['user_name']
         customer_name = params['customer_name']
         quote_name =  params['quote_name']
-        index_name = "#{user_name}-#{customer_name}-#{quote_name}"
+        estimate_name = "#{user_name}-#{customer_name}-#{quote_name}"
 	months = params['months']
 	month_start_percentage = params['month_start_percentage']
 	month_growth_percentage = params['month_growth_percentage']
 	cookies[:user_name] = user_name
-	cookies[:index_name] = index_name
-	@estimate = EstimateModel.create(:name => index_name,:months => months,:month_growth_percentage => month_growth_percentage,:month_start_percentage => month_start_percentage)
+	cookies[:estimate_name] = estimate_name
+	@estimate = EstimateModel.create(:name => estimate_name,:months => months,:month_growth_percentage => month_growth_percentage,:month_start_percentage => month_start_percentage)
+	@dm = JS::DailyModel.new
+	@dm.name = "#{estimate_name}-DailyModel"
+	# warm sdb and load default model 
+	@dm.get_daily_model('m1small',1,1,1)
 	redirect ("/configs/show_estimate")
     #render
   end
@@ -68,13 +73,12 @@ class Configs < Merb::Controller
     controller == "layout" ? "layout.#{action}.#{type}" : "#{action}.#{type}"
   end
   def show_estimate
-        @dy = DyModel.new
-        @index_name = cookies[:index_name]
+        @estimate_name = cookies[:estimate_name]
         if (params['estimate'])
-                @index_name = params['estimate']
-                cookies[:index_name] = params['estimate']
+                @estimate_name = params['estimate']
+                cookies[:estimate_name] = params['estimate']
         end
-	@estimate = EstimateModel.first(:name => @index_name)
+	@estimate = EstimateModel.first(:name => @estimate_name)
 	if (params['months'])
 		@estimate.update(:months => params['months'],:month_growth_percentage => params['months_growth_percentage'],:month_start_percentage => params['month_start_percentage'])
                 @months = params['months']
@@ -85,21 +89,21 @@ class Configs < Merb::Controller
 		@month_growth_percentage = @estimate.month_growth_percentage
 		@month_start_percentage = @estimate.month_start_percentage
         end
-	@configs = Iconf.all(:name.like => "#{@index_name}%")
+	@configs = Iconf.all(:name.like => "#{@estimate_name}%")
         render
   end
   def index
- 	@dy = DyModel.new
+ 	#@dy = DyModel.new
     	render :new_config
   end
   def add_config
-	@index_name = cookies[:index_name]
+	@estimate_name = cookies[:estimate_name]
 	name = params['name']
-	ic = Iconf.create(:name => "#{@index_name}-#{name}",:type => params['type'],:min_q => params['min_q'],:max_q => params['max_q'],:days => params['days'],:weekend_usage => params['weekend_usage'])
+	ic = Iconf.create(:name => "#{@estimate_name}-#{name}",:type => params['type'],:min_q => params['min_q'],:max_q => params['max_q'],:days => params['days'],:weekend_usage => params['weekend_usage'])
 	redirect ("/configs/show_estimate")
   end
   def update_config
-	@index_name = cookies[:index_name]
+	@estimate_name = cookies[:estimate_name]
         name = params['name']
 	ic = Iconf.first(:name => name)
         ic.update(:name => name,:type => params['type'],:min_q => params['min_q'],:max_q => params['max_q'],:days => params['days'],:weekend_usage => params['weekend_usage'])
@@ -113,7 +117,7 @@ class Configs < Merb::Controller
   end
   def edit_config
 	@dy = DyModel.new
-	@index_name = cookies[:index_name]
+	@estimate_name = cookies[:estimate_name]
 	key,skey = getCreds()
         #@sdb = RightAws::SdbInterface.new(key,skey)
 	@config_name = params['config_key']
@@ -124,10 +128,10 @@ class Configs < Merb::Controller
   end
   def edit_daily
 	@dy = DyModel.new
-	@index_name = cookies[:index_name]
+	@estimate_name = cookies[:estimate_name]
 	#@usage = params['usage']
 	@usage = 1
-	dm = DailyModel.first(:name => "#{@index_name}-DailyModel")
+	dm = DailyModel.first(:name => "#{@estimate_name}-DailyModel")
 	if (dm == nil)
 		puts "Using Default Daily Model"
         	@daily_model,min,max = @dy.get_daily_usage(@usage)
@@ -148,8 +152,8 @@ class Configs < Merb::Controller
 			@daily_model[hour] = params[name]	
 		end
 	end
-	@index_name = cookies[:index_name]
-	dm = DailyModel.create(:name => "#{@index_name}-DailyModel",:yaml => @daily_model.to_yaml)
+	@estimate_name = cookies[:estimate_name]
+	dm = DailyModel.create(:name => "#{@estimate_name}-DailyModel",:yaml => @daily_model.to_yaml)
 	redirect ("/configs/show_estimate")
 	
   end
@@ -199,21 +203,21 @@ class Iconf
 		return t
 	end
 end
-class DailyModel
-	include DataMapper::Resource
-	property :id,Serial
-	property :name, String, :nullable => false
-	property :yaml, String, :nullable => false
-	def config
-		config = {}
-		config = YAML::load(self.yaml)
-	end
-	def get_daily_usage(usage)
-		model = self.config
-		for hour in model.keys
-               	 	hourly_usage = model[hour]
-                	model[hour] = hourly_usage.to_f * usage.to_f
-        	end
-        	return model
-	end
-end
+#class DailyModel
+	#include DataMapper::Resource
+	#property :id,Serial
+	#property :name, String, :nullable => false
+	#property :yaml, String, :nullable => false
+	#def config
+		#config = {}
+		#config = YAML::load(self.yaml)
+	#end
+	#def get_daily_usage(usage)
+		#model = self.config
+		#for hour in model.keys
+               	 	#hourly_usage = model[hour]
+                	#model[hour] = hourly_usage.to_f * usage.to_f
+        	#end
+        	#return model
+	#end
+#end

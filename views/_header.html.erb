@@ -11,9 +11,9 @@ if (cookies[:user_name] == nil || params['user_name'] == nil)
 	puts "REDIRECT"
 end
 
-if (@index_name != nil || params['estimate'] != nil)
+if (@estimate_name != nil || params['estimate'] != nil)
         %>
-        <th>Working on Estimate: <a href=/configs/show_daily_price><%= @index_name %></a></th>
+        <th>Working on Estimate: <a href=/configs/show_daily_price><%= @estimate_name %></a></th>
         <%
 end
 %>

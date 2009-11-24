@@ -22,12 +22,11 @@ end
 </ul>
 </div>
 <% 
-@dm = DailyModel.first(:name => "#{@index_name}-DailyModel")
+#@dm = DailyModel.first(:name => "#{@index_name}-DailyModel")
 for month in 1..@months.to_i
 	@usage = @month_start_percentage.to_f + (@month_start_percentage.to_f * @month_growth_percentage.to_f * month.to_i)
 	@usage = 1 if (@usage >= 1 )
-	#puts "USAGE: #{@usage} #{@month_start_percentage} * (#{@month_start_percentage} * #{@month_growth_percentage} #{month})"
-	@daily_model = @dm.get_daily_usage(@usage)
+	#@daily_model = @dm.get_daily_usage(@usage)
 	%>
 	<div id="<%=month%>">
 	<b>Month <%= month %></b><br/>

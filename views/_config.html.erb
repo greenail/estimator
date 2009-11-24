@@ -1,93 +1,13 @@
 <%
-# converting config back to a hash sucks but not doing it would be
-# a major refactor of lib-priz
+# Initialize stuff
+dmname = "#{@estimate_name}-DailyModel"
+dm = JS::DailyModel.first(:name => dmname)
+dm.get_daily_model(config.type,@usage.to_f,config.min_q.to_f,config.max_q.to_f)
+dm.weekend_usage = config.weekend_usage.to_f
+dm.weekend_days = 7 - config.days.to_i
 
-# initialize stupidly huge ammount of variables
-count = 0.0
-od_no_scale_project_cost = 0.0
-od_project_cost = 0.0
-total_ri_upfront = 0.0
-ri_optimized_project_cost = 0.0
-config_hash = config.to_hash
-ami_types = @dy.get_types
-ami_type = ami_types[config.type.to_sym]
-puts "AMITYPE: #{ami_type}"
-daily_matrix,min,max = @dy.calc_daily_matrix(config,@usage)
-optimal_RIs = @dy.calc_optimal_ri(config_hash,@usage)
-weekly_optimized_cost,riop = @dy.calc_ri_optimized_price(optimal_RIs,daily_matrix,config_hash)
+# TODO:  want to put the config once per iteration instead of all this crap
+#dm.put_config(config)
+optimal_ris = dm.calc_optimal_ris
 %>
-<br />
-Optimal Reserved Instances: <%= optimal_RIs %><br />
-<table border=1>
-<tr>
-<center><th colspan=10><%= config.name %>
-	 <a href=<%= URI.escape("/configs/edit_config?config_key=#{config.name}") %>>
-	 Edit --- 
-	</a>
-	<a href="/configs/delete_config?config_key=<%= config.name %>">
-	Delete
-	</a>
-</th></center></tr>
-<tr>
-<th> Hour: </th>
-<%
-for hour in daily_matrix.keys.sort
-        %><th><%=hour%></th><%
-end
-%>
-<th>Total</th>
-<th>RI 1 Year Up Front Cost</th>
-<th>Total Annual Cost</th>
-</tr>
-<tr>
-<th>Number of Instances</th>
-</tr>
-<tr>
-<th>Number of Instances</th>
-<%
-count = 0
-for key in daily_matrix.keys.sort
-        iu = daily_matrix[key]
-        noi = iu[:number_of_instances]
-        usage = iu[:usage]
-        %><td><%=noi%></td><%
-        count += noi.to_i
-end
-%>
-<td><%=count%></td></tr>
-<th>On Demand Price $<%= ami_type[:OD_hourly].to_f %></th>
-<%
-count = 0.0
-ri_one_year = 0.0
-for key in daily_matrix.keys.sort
-        iu = daily_matrix[key]
-        noi = iu[:number_of_instances]
-        od_price = noi.to_i * ami_type[:OD_hourly].to_f
-        #puts "OD Price = NOI: #{noi} OD_hourly #{ ami_type[:OD_hourly].to_f}  $"
-        %><td><%=od_price%></td><%
-        count += od_price.to_f
-end
-od_no_scale_project_cost += max.to_f * ami_type[:OD_hourly].to_f*24*365
-od_project_cost += count * 365
-%>
-<td><%=count%></td>
-<td>$0.00</td><td><%= count * 365 %></td>
-</tr>
-<th>RI Optimized Price</th>
-<%
-count = 0.0
-for hour in riop.keys.sort
-        rio_price = riop[hour]
-        %><td><%=rio_price%></td><%
-        count += rio_price.to_f
-end
-ri_one_year = ami_type[:RI_y1_install].to_f * optimal_RIs.to_f
-total_ri_upfront += ri_one_year
-ri_optimized_project_cost +=  ri_one_year + (count.to_f * 365)
-%>
-<td><%=count%></td>
-<td><%= ri_one_year %></td><td><%= (count.to_f * 365) + ri_one_year %></td>
-</tr>
-</table>
-Config RI Upfront Payment: <%= total_ri_upfront %><br />
-<br>
+Optimal Reserved Instances: <%= optimal_ris %><br />

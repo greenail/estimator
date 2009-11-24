@@ -16,7 +16,7 @@ Add a new Config
 <td>
 <select name=type>
 <%
-ami_types = @dy.get_types
+ami_types = open('ami_types.yaml') { |f| YAML.load(f) }
 for type in ami_types.keys
 	%><option value=<%= type %>><%= type %></option> <%	
 end
