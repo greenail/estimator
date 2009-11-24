@@ -52,9 +52,11 @@ class Estimate  < Merb::Controller
         quote_name =  params['quote_name']
         index_name = "#{user_name}-#{customer_name}-#{quote_name}"
 	months = params['months']
+	month_start_percentage = params['month_start_percentage']
+	month_growth_percentage = params['month_growth_percentage']
 	cookies[:user_name] = user_name
 	cookies[:index_name] = index_name
-	@estimate = EstimateModel.create(:name => index_name,:months => months)
+	@estimate = EstimateModel.create(:name => index_name,:months => months,:month_growth_percentage => month_growth_percentage,:month_start_percentage => month_start_percentage)
 	redirect ("/configs/show_estimate")
     #render
   end
@@ -72,17 +74,16 @@ class Configs < Merb::Controller
                 @index_name = params['estimate']
                 cookies[:index_name] = params['estimate']
         end
-        @month_start_percentage = 0.5
-        @month_start_percentage = params['month_start_percentage'] if params['month_start_percentage']
-        @month_growth_percentage = 0.16
-        @month_growth_percentage = params['month_growth_percentage'] if params['month_growth_percentage']
 	@estimate = EstimateModel.first(:name => @index_name)
 	if (params['months'])
+		@estimate.update(:months => params['months'],:month_growth_percentage => params['months_growth_percentage'],:month_start_percentage => params['month_start_percentage'])
                 @months = params['months']
-                @estimate.months = @months
-                @estimate.save
+		@month_growth_percentage = params['month_growth_percentage']
+		@month_start_percentage = params['month_start_percentage']
         else
                 @months = @estimate.months
+		@month_growth_percentage = @estimate.month_growth_percentage
+		@month_start_percentage = @estimate.month_start_percentage
         end
 	@configs = Iconf.all(:name.like => "#{@index_name}%")
         render
@@ -123,8 +124,18 @@ class Configs < Merb::Controller
   end
   def edit_daily
 	@dy = DyModel.new
-	@usage = params['usage']
-        @daily_model,min,max = @dy.get_daily_usage(@usage)
+	@index_name = cookies[:index_name]
+	#@usage = params['usage']
+	@usage = 1
+	dm = DailyModel.first(:name => "#{@index_name}-DailyModel")
+	if (dm == nil)
+		puts "Using Default Daily Model"
+        	@daily_model,min,max = @dy.get_daily_usage(@usage)
+	else
+		puts "Using SDB Model"
+		@daily_model = dm.config
+	end
+
 	render :edit_daily_model
   end
   def update_daily_model
@@ -137,9 +148,10 @@ class Configs < Merb::Controller
 			@daily_model[hour] = params[name]	
 		end
 	end
-	#@dy.put_daily_model(@daily_model)
-        #@daily_model,min,max = @dy.get_daily_usage	
-	render :edit_daily_model
+	@index_name = cookies[:index_name]
+	dm = DailyModel.create(:name => "#{@index_name}-DailyModel",:yaml => @daily_model.to_yaml)
+	redirect ("/configs/show_estimate")
+	
   end
 
 end
@@ -160,6 +172,8 @@ class EstimateModel
 	property :id,Serial
 	property :name, String, :nullable => false
 	property :months, Integer, :nullable => false
+	property :month_growth_percentage, String, :nullable => false
+	property :month_start_percentage, String, :nullable => false
 	# configs is a hash of config names
 	property :configs, Object
 end
@@ -183,5 +197,23 @@ class Iconf
 		t[:days_of_week] = @days
 		t[:weekend_usage] = @weekend_usage
 		return t
+	end
+end
+class DailyModel
+	include DataMapper::Resource
+	property :id,Serial
+	property :name, String, :nullable => false
+	property :yaml, String, :nullable => false
+	def config
+		config = {}
+		config = YAML::load(self.yaml)
+	end
+	def get_daily_usage(usage)
+		model = self.config
+		for hour in model.keys
+               	 	hourly_usage = model[hour]
+                	model[hour] = hourly_usage.to_f * usage.to_f
+        	end
+        	return model
 	end
 end

@@ -11,6 +11,7 @@ hours = []
 usages = []
 @daily_model.sort.each { |key,value| 
 	next if key == "timezone"
+	puts "VALUE #{value} #{@daily_model[key]}"
 	%>
 	<td><%=key%></td>
 	<td><input type=text size=3 name=<%= "usage-#{key}" %> value=<%=value%>></td>

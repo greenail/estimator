@@ -4,7 +4,10 @@
 <form action=/estimate/create method=post>
 Customer Name<input type=text name=customer_name>
 Your Name<input type=text name=user_name value=<%=@user_name%>>
-Quote Name<input type=text name=quote_name>
+Quote Name<input type=text name=quote_name><br/>
 Months to Ramp Project<input type=text name=months value=12>
+Percentage of peak usage on month 1 <input type=text name=month_start_percentage value=.4>
+Percentage of growth each month <input type=text name=month_growth_percentage
+value=.2>
 <input type=submit name=go>
 </form>
