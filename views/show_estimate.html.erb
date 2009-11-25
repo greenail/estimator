@@ -1,18 +1,19 @@
 <%= partial( "header" ) %>
 <h2>Dynamic Costs for Configuration</h2>
-<table cellspacing=2>
+<table cellspacing=20>
 <tr>
+<td>
+<%= partial("monthly_config") %>
+</td>
 <td>
 <a href=/configs/edit_daily>Edit Weekday Usage Model</a><br />
 <a href=/configs>Add Instance Configuration</a><br />
-</td>
-<td>
-<%= partial("monthly_config") %>
 </td>
 </tr>
 </table>
 <div id="navcontainer">
 <ul id="navlist" class="idTabs">
+<li><a href="#totals">Totals</a></li>
 <%
 for month in 1..@months.to_i
 	%><li><a href="#<%=month%>">Month: <%=month%></a></li><%
@@ -22,9 +23,14 @@ end
 </div>
 <% 
 #@dm = DailyModel.first(:name => "#{@index_name}-DailyModel")
+@ri_counter = 0
+@m_onetime = 0.0
+@m_monthly = 0.0
+@current_onetime = 0.0
 for month in 1..@months.to_i
 	@usage = @month_start_percentage.to_f + (@month_start_percentage.to_f * @month_growth_percentage.to_f * month.to_i)
 	@usage = 1 if (@usage >= 1 )
+	@m_onetime = 0.0
 	%>
 	<div id="<%=month%>">
 	<b>Month <%= month %></b><br/>
@@ -34,9 +40,18 @@ for month in 1..@months.to_i
         	<%= partial("config",:with => config) %>
         	<%
 	end
-	%></div><%
-	
+	%>
+	Cumulative Hourly Cost: <%= @m_monthly %><br/>
+	Cumulative Reserved Instance cost: <%= @m_onetime %><br/>
+	</div><%
+	if (@m_onetime != 0)
+		@current_onetime = @m_onetime
+	end	
 end
 %>
+<div id="totals">
+Total Monthly Recurring for <%= @months %> Months: <%=@m_monthly %><br/>
+Total Reserved Instances over <%= @months %> Months: <%= @current_onetime %><br/>
+</div>
 </body>
 </html>

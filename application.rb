@@ -90,6 +90,10 @@ class Configs < Merb::Controller
 		@month_start_percentage = @estimate.month_start_percentage
         end
 	@configs = Iconf.all(:name.like => "#{@estimate_name}%")
+	@e_total_onetime = 0.0
+	@e_total_monthly = 0.0
+	@e_month_1 = 0.0
+	@e_month_n = 0.0
         render
   end
   def index
@@ -116,12 +120,9 @@ class Configs < Merb::Controller
 	redirect ("/configs/show_estimate")
   end
   def edit_config
-	@dy = DyModel.new
+	#@dy = DyModel.new
 	@estimate_name = cookies[:estimate_name]
-	key,skey = getCreds()
-        #@sdb = RightAws::SdbInterface.new(key,skey)
 	@config_name = params['config_key']
-	#@name,@config = @dy.get_instance_config(@sdb,@config_name)
 	@c = Iconf.first(:name =>@config_name)
 	@config = @c.to_hash
 	render :edit_config

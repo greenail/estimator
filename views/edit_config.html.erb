@@ -14,7 +14,7 @@
 <td>
 <select name=type>
 <%
-ami_types = @dy.get_types
+ami_types = open('ami_types.yaml') { |f| YAML.load(f) }
 for type in ami_types.keys
 	selected = ""
 	if (type.to_s == @config[:type].to_s)
