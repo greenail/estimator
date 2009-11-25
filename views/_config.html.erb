@@ -15,8 +15,78 @@ rio_price,first_month_price = dm.calc_annual_price_with_ri(optimal_ris)
 #	Need to add Project Total
 #  	Need to reduce calls to SimpleDB
 %>
+<div class="msg_list">
+<p class="msg_head"><%= config.name.split("-").last %>: Daily Breakout </p>
+<div class="msg_body">
 Optimal Reserved Instances: <%= optimal_ris %><br />
 First Month Cost: <%= first_month_price %><br />
 
+<table border=1>
+<tr>
+<center><th colspan=10><%= config.name %>
+         <a href=<%= URI.escape("/configs/edit_config?config_key=#{config.name}") %>>
+         Edit ---
+        </a>
+        <a href="/configs/delete_config?config_key=<%= config.name %>">
+        Delete
+        </a>
+</th></center></tr>
+<tr>
+<th> Hour: </th>
+<%
+dm.day.sort.each { |key, hour|
+	%><th><%=key%></th><%
+	}
+%>
+<th>Total</th>
+</tr>
+<tr>
+<th>Hourly Utilization %</th>
+<%
+total = 0.0
+dm.day.sort.each { |key, hour|
+        %><td><%=hour.usage%></td><%
+	total += hour.usage.to_f
+        }
+%>
+<td><%=total%></td>
+</tr>
+<tr>
+<th>Number of Instances</th>
+<%
+total = 0.0
+dm.day.sort.each { |key, hour|
+        %><td><%=hour.instances%></td><%
+	total += hour.instances.to_i
+        }
+%>
+<td><%=total%></td>
+</tr>
+<tr>
+<th>On Demand Cost (* UNOPTIMIZED *)</th>
+<%
+total = 0.0
+dm.day.sort.each { |key, hour|
+        %><td><%=hour.od_price%></td><%
+        total += hour.od_price.to_f
+        }
+%>
+<td>$<%=total%></td>
+</tr>
+<tr>
+<th>Reserved Instance Optimized Cost</th>
+<%
+total = 0.0
+dm.day.sort.each { |key, hour|
+        %><td><%=hour.rio_price%></td><%
+        total += hour.rio_price.to_f
+        }
+%>
+<td>$<%=total%></td>
+</tr>
+
+</table>
+</div>
+</div>
 
 

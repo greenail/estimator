@@ -1,7 +1,6 @@
 <%= partial( "header" ) %>
-
 <h2>Dynamic Costs for Configuration</h2>
-<table spacing=20>
+<table cellspacing=2>
 <tr>
 <td>
 <a href=/configs/edit_daily>Edit Weekday Usage Model</a><br />
@@ -26,13 +25,12 @@ end
 for month in 1..@months.to_i
 	@usage = @month_start_percentage.to_f + (@month_start_percentage.to_f * @month_growth_percentage.to_f * month.to_i)
 	@usage = 1 if (@usage >= 1 )
-	#@daily_model = @dm.get_daily_usage(@usage)
 	%>
 	<div id="<%=month%>">
 	<b>Month <%= month %></b><br/>
 	<%
 	for config in @configs
-        	%><%= config.name%><br />
+        	%>
         	<%= partial("config",:with => config) %>
         	<%
 	end
@@ -40,11 +38,5 @@ for month in 1..@months.to_i
 	
 end
 %>
-
-<%
-#for config in @configs
-	#%><%= config.name%><br />
-	#<%= partial("config",:with => config) %>
-	#<%
-#end
-%>
+</body>
+</html>

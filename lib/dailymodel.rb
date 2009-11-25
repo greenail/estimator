@@ -110,13 +110,20 @@ class DailyModel
 	def calc_annual_price_with_ri(ri)
 		daily_rio_price = 0.0
 		@day.each { |k,hour|
+			rio_price = 0.0
 			if (hour.instances >= ri)
 				#od_instances = ri - hour.instances
 				od_instances =  hour.instances - ri
 				ri_price = ri * @ami_type[:RI_hourly].to_f
 				od_price = od_instances * @ami_type[:OD_hourly].to_f
-				daily_rio_price += ri_price + od_price
+				rio_price = ri_price + od_price
+				daily_rio_price += rio_price
+			else
+				ri_price = ri * @ami_type[:RI_hourly].to_f
+				rio_price = ri_price * hour.instances
+				daily_rio_price += rio_price
 			end
+			@day[k].rio_price = rio_price
 		}
 		weekend_instances = (@model_max * @weekend_usage).to_f.round
                 if (weekend_instances < @model_min)
