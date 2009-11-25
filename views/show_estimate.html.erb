@@ -27,10 +27,12 @@ end
 @m_onetime = 0.0
 @m_monthly = 0.0
 @current_onetime = 0.0
+@unoptimized_price = 0.0
 for month in 1..@months.to_i
 	@usage = @month_start_percentage.to_f + (@month_start_percentage.to_f * @month_growth_percentage.to_f * month.to_i)
 	@usage = 1 if (@usage >= 1 )
 	@m_onetime = 0.0
+	@unoptimized_price = 0.0
 	%>
 	<div id="<%=month%>">
 	<b>Month <%= month %></b><br/>
@@ -52,6 +54,8 @@ end
 <div id="totals">
 Total Monthly Recurring for <%= @months %> Months: <%=@m_monthly %><br/>
 Total Reserved Instances over <%= @months %> Months: <%= @current_onetime %><br/>
+Savings from RI Optimization:  <%= @unoptimized_price - @m_monthly %><br/>
+Savings from Daily Dynamic Scaling: <br/>
 </div>
 </body>
 </html>

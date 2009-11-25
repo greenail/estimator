@@ -81,7 +81,7 @@ class DailyModel
 		#self.save
 	end
 	def calc_optimal_ris
-		annual_unoptimized_price,first_month_price = calc_annual_unoptimiezed_price	
+		annual_unoptimized_price = calc_annual_unoptimiezed_price	
 		optimal_ris = 0
 		best_price = annual_unoptimized_price
 		#iterate from min to max to find best RI number	

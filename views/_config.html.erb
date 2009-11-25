@@ -5,6 +5,7 @@ dm = JS::DailyModel.first(:name => dmname)
 dm.get_daily_model(config.type,@usage.to_f,config.min_q.to_f,config.max_q.to_f)
 dm.weekend_usage = config.weekend_usage.to_f
 dm.weekend_days = 7 - config.days.to_i
+@unoptimized_price += dm.calc_annual_unoptimiezed_price
 # TODO:  want to put the config once per iteration instead of all this crap
 #dm.put_config(config)
 optimal_ris = dm.calc_optimal_ris
@@ -35,8 +36,8 @@ Optimal Reserved Instances: <%= optimal_ris %><br />
         <a href="/configs/delete_config?config_key=<%= config.name %>">
         Delete
         </a>
-	Instance Type: <%= config.type %>
-	Days to Run this Model: <%= config.days %>
+	Instance Type: <%= config.type %> 
+	Days to Run this Model: <%= config.days %> 
 </th></center></tr>
 <tr>
 <th> Hour: </th>
