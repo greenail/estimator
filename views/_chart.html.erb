@@ -21,7 +21,7 @@ max = 0.0
 GoogleChart::LineChart.new('800x200', @chart_name, false) do |lc|
       	lc.data @chart_name, data, '0000ff'
 	lc.axis :y, :range => [min,max], :color => 'ff00ff', :font_size => 16, :alignment => :center
-      	lc.axis :x, :range => [1,12], :color => '00ffff', :font_size => 16, :alignment => :center
+      	lc.axis :x, :range => [1,@months], :color => '00ffff', :font_size => 16, :alignment => :center
         chart_url = lc.to_url
         end
 %><img src=<%=chart_url%>>
