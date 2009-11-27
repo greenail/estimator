@@ -1,0 +1,8 @@
+development: &defaults
+      adapter:  'simpledb'
+      database: 'default'
+      access_key: 'YOURKEYHERE'
+      secret_key: 'YOURKEYHERE'
+      domain: 'estimates'
+      base_url: 'http://sdb.amazon.com'
+
