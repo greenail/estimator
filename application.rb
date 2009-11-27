@@ -2,6 +2,7 @@
 require 'lib/dailymodel.rb'
 require '/root/creds.rb'
 require 'right_aws'
+require 'google_chart'
 
 class Priz < Merb::Controller
 
@@ -23,7 +24,7 @@ class Priz < Merb::Controller
 	#@dy = DyModel.new
 	#key,skey = getCreds()
         #@sdb = RightAws::SdbInterface.new(key,skey)
-	@estimates = EstimateModel.all
+	@estimates = EstimateModel.all(:name.like => "#{@user_name}%")
     	render
   end
   def login

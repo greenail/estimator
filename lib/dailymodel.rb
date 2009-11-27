@@ -50,7 +50,8 @@ class DailyModel
 		hs = {}
 		if (self.yaml != nil)
 			puts "Loading SimpleDB Model"
-			hs =  YAML::load(self.yaml)
+			#hs =  YAML::load(self.yaml)
+			hs =  YAML::load(@yaml)
 		end
 		if (@day.size == 0 && self.yaml == nil)
 			puts "Loading Default Model"

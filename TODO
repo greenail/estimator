@@ -1,5 +1,8 @@
 FIX edit daily model, not sure why save_yaml is not working
 Add delete to Estimate, and delete all children
+put % values as whole number
+change % to whole number % in daily view
+move number of instances above % utilization
 
 
 

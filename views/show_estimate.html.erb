@@ -24,9 +24,13 @@ end
 <% 
 #@dm = DailyModel.first(:name => "#{@index_name}-DailyModel")
 @ri_counter = 0
+@price_history = {}
+@cumulative_price_history = {0 => 0.0}
 @m_onetime = 0.0
 @m_monthly = 0.0
 @current_onetime = 0.0
+@new_onetime = 0.0
+@new_onetime_history = {}
 @unoptimized_price = 0.0
 for month in 1..@months.to_i
 	@usage = @month_start_percentage.to_f + (@month_start_percentage.to_f * @month_growth_percentage.to_f * month.to_i)
@@ -45,17 +49,37 @@ for month in 1..@months.to_i
 	%>
 	Cumulative Hourly Cost: <%= @m_monthly %><br/>
 	Cumulative Reserved Instance cost: <%= @m_onetime %><br/>
-	</div><%
+	<%
 	if (@m_onetime != 0)
+		@new_onetime =  @m_onetime - @current_onetime 
 		@current_onetime = @m_onetime
 	end	
+	%>New Reserved Instance Purchase cost: <%= @new_onetime %><br/>
+	</div><%
+	@new_onetime_history[month] = @new_onetime
+	@price_history[month] = @m_monthly + @new_onetime
+        if (@cumulative_price_history[month -1] != nil)
+                @cumulative_price_history[month] = @cumulative_price_history[month -1] + @m_monthly + @new_onetime
+        else
+                @cumulative_price_history[month] =  @m_monthly + @new_onetime
+        end
+
 end
 %>
 <div id="totals">
-Total Monthly Recurring for <%= @months %> Months: <%=@m_monthly %><br/>
-Total Reserved Instances over <%= @months %> Months: <%= @current_onetime %><br/>
-Savings from RI Optimization:  <%= @unoptimized_price - @m_monthly %><br/>
-Savings from Daily Dynamic Scaling: <br/>
+<b>Total Monthly Recurring For <%= @months %> Months:</b> <%=@m_monthly %><br/>
+<b>Total Reserved Instance Purchase Cost Over <%= @months %> Months: </b><%= @current_onetime %><br/>
+<b>Savings from RI Optimization:  </b><%= @unoptimized_price - @m_monthly %><br/>
+<b>Savings from Daily Dynamic Scaling: </b><br/>
+<p>
+<% @chart_data = @price_history;@chart_name = "monthly expense" %>
+<%= partial("chart") %><br/>
+<% @chart_data = @cumulative_price_history ; @chart_name = "cumulative spend"%>
+<%= partial("chart") %><br/>
+<% @chart_data = @new_onetime_history ; @chart_name = "new onetime spend"%>
+<%= partial("chart") %><br/>
+</p>
 </div>
+
 </body>
 </html>
