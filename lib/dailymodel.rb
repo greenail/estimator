@@ -87,7 +87,8 @@ class DailyModel
 		best_price = annual_unoptimized_price
 		#iterate from min to max to find best RI number	
 		for i in @model_min.to_i..@max_instances
-			rio_price,first_month_price = calc_annual_price_with_ri(i)	
+			rio_price,first_month_price,ri_one_time = calc_annual_price_with_ri(i)	
+			puts "OPTIMAL RIs: comparing #{best_price} with #{rio_price} for ##{i} RIs"
 			if (rio_price < best_price)
 				best_price = rio_price
 				optimal_ris = i
@@ -110,22 +111,23 @@ class DailyModel
 	end
 	def calc_annual_price_with_ri(ri)
 		daily_rio_price = 0.0
-		@day.each { |k,hour|
+		print "\n"
+		@day.sort.each { |k,hour|
 			rio_price = 0.0
 			if (hour.instances >= ri)
-				#od_instances = ri - hour.instances
 				od_instances =  hour.instances - ri
 				ri_price = ri * @ami_type[:RI_hourly].to_f
 				od_price = od_instances * @ami_type[:OD_hourly].to_f
 				rio_price = ri_price + od_price
-				daily_rio_price += rio_price
 			else
-				ri_price = ri * @ami_type[:RI_hourly].to_f
-				rio_price = ri_price * hour.instances
-				daily_rio_price += rio_price
+				rio_price =  hour.instances * @ami_type[:RI_hourly].to_f
 			end
-			@day[k].rio_price = rio_price
+			#print "Hour #{k} price: #{rio_price}"
+			daily_rio_price += rio_price
+			# TODO: figure out how to set this for optimal ri instead of for each iteration of optimal ri test
+			#@day[k].rio_price = daily_rio_price
 		}
+		 #print "\n"
 		weekend_instances = (@model_max * @weekend_usage).to_f.round
                 if (weekend_instances < @model_min)
                         weekend_instances = @model_min
@@ -135,10 +137,11 @@ class DailyModel
 		#puts "Weekday Price: #{daily_rio_price}"
                 #puts "Weekend Price: #{weekend_rio_price}"
                 #puts "Weekly Price: #{weekly_price}"
-		@ri_one_time = @ami_type[:RI_y1_install] * ri
-		annual_price = weekly_price * 52 + @ri_one_time
-		first_month_price = weekly_price * 4.3333333 + @ri_one_time
-		return annual_price, first_month_price
+		ri_one_time = @ami_type[:RI_y1_install] * ri
+		annual_price = weekly_price * 52 + ri_one_time
+		first_month_price = weekly_price * 4.3333333 + ri_one_time
+		puts "Daily RIO: #{daily_rio_price} weekly: #{weekly_price} RI onetime: #{@ri_one_time} #ri #{ri} annual_price: #{annual_price}"
+		return annual_price, first_month_price, ri_one_time
 	end
 	def print_day
 		for hour in @day.keys.sort

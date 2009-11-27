@@ -9,7 +9,8 @@ dm.weekend_days = 7 - config.days.to_i
 # TODO:  want to put the config once per iteration instead of all this crap
 #dm.put_config(config)
 optimal_ris = dm.calc_optimal_ris
-annual_price,first_month_price = dm.calc_annual_price_with_ri(optimal_ris)
+#puts "OPTIMAL RIS #{optimal_ris}"
+annual_price,first_month_price,ri_one_time = dm.calc_annual_price_with_ri(optimal_ris)
 rio_price,first_month_price = dm.calc_annual_price_with_ri(optimal_ris)
 # TODO: need to figure out difference between previous month's RI purchase if we add an RI.
 # 	Need to add a Monthly Total sans RI one time
@@ -17,9 +18,9 @@ rio_price,first_month_price = dm.calc_annual_price_with_ri(optimal_ris)
 #  	Need to reduce calls to SimpleDB
 if (optimal_ris > @ri_counter)
 	ri_counter = optimal_ris
-	@m_onetime += dm.ri_one_time
+	@m_onetime += ri_one_time
 end
-@m_monthly += first_month_price - dm.ri_one_time
+@m_monthly += first_month_price - ri_one_time
 %>
 <div class="msg_list">
 <p class="msg_head"><%= config.name.split("-").last %>: details 
