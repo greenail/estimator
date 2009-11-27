@@ -1,0 +1,27 @@
+<%
+data = []
+chart_url = ""
+min = 0.0
+max = 0.0
+%><ul id="navlist"> <%
+@chart_data.sort.each { |k,values|
+	next if k == 0
+	if(params['debug'])
+        	%><li>M: <%=k%> $<%=values%></li> <%
+	end
+	if (values < min)
+		min = values
+	end
+	if (values > max)
+		max = values
+	end
+	data.push(values)
+        }
+%></ul><br/><%
+GoogleChart::LineChart.new('800x200', @chart_name, false) do |lc|
+      	lc.data @chart_name, data, '0000ff'
+	lc.axis :y, :range => [min,max], :color => 'ff00ff', :font_size => 16, :alignment => :center
+      	lc.axis :x, :range => [1,12], :color => '00ffff', :font_size => 16, :alignment => :center
+        chart_url = lc.to_url
+        end
+%><img src=<%=chart_url%>>
