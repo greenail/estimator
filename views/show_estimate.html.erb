@@ -3,7 +3,10 @@ Dynamic Costs for Configuration<br/>
 <table cellspacing=5>
 <tr>
 <td>
+<div class=foo></div>
+<div class=bar>
 <%= partial("monthly_config") %>
+</div>
 </td>
 <td>
 <a href=/configs/edit_daily>Edit Weekday Usage Model</a><br />
@@ -32,6 +35,8 @@ end
 @new_onetime = 0.0
 @new_onetime_history = {}
 @unoptimized_price = 0.0
+@utilization_maxed = 0
+@month_history = {}
 for month in 1..@months.to_i
 	@usage = @month_start_percentage.to_f + (@month_start_percentage.to_f * @month_growth_percentage.to_f * month.to_i)
 	@usage = 1 if (@usage >= 1 )
@@ -63,9 +68,14 @@ for month in 1..@months.to_i
         else
                 @cumulative_price_history[month] =  @m_monthly + @new_onetime
         end
-
+	@month_history[month] = @usage
 end
+@chart_data = @month_history
 %>
+<div id=move>
+Monthly Growth Chart: <br/>
+<%= partial("spark") %>
+</div>
 <div id="totals">
 <b>Total Monthly Recurring For <%= @months %> Months:</b> <%=@m_monthly %><br/>
 <b>Total Reserved Instance Purchase Cost Over <%= @months %> Months: </b><%= @current_onetime %><br/>

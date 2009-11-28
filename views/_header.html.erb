@@ -13,6 +13,12 @@
 $(document).ready(function()
 {
   //hide the all of the element with class msg_body
+  $("#move").insertAfter("div.foo");
+  $("div.bar").hide();
+  $("#spark").click(function()
+  {
+    $("div.bar").toggle();
+  });
   $(".msg_body").hide();
   //toggle the componenet with class msg_body
   $(".msg_head").click(function()
