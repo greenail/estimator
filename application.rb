@@ -61,8 +61,9 @@ class Estimate  < Merb::Controller
 	@estimate = EstimateModel.create(:name => estimate_name,:months => months,:month_growth_percentage => month_growth_percentage,:month_start_percentage => month_start_percentage)
 	@dm = JS::DailyModel.new
 	@dm.name = "#{estimate_name}-DailyModel"
+	@dm.save
 	# warm sdb and load default model 
-	@dm.get_daily_model('m1small',1,1,1)
+	#@dm.get_daily_model('m1small',1,1,1)
 	redirect ("/configs/show_estimate")
     #render
   end
@@ -141,11 +142,14 @@ class Configs < Merb::Controller
 	for name in params.keys.sort
 		if (name =~ /^usage/)
 			nada, hour = name.split("-")
-			print " #{hour}-#{params[name]} "
-			@dm.put_hour(hour,params[name])
+			print " #{hour.to_i}-#{params[name].to_f} "
+			@dm.put_hour(hour.to_i,params[name].to_f)
 		end
 	end
-	@dm.save_yaml
+	tmp_name = @dm.name
+	@dm.name = "flrorme"
+	@dm.save
+	@dm.name = tmp_name
 	@dm.save
 	redirect ("/configs/show_estimate")
 	

@@ -18,6 +18,8 @@ class DailyModel
 		@usage = usage	
 		@day = {}
 		@max_instances = 0
+		hs = open('default_daily_usage.yaml') { |f| YAML.load(f) }
+                @yaml = hs.to_yaml
 		
 	end
 	def get_types
@@ -27,10 +29,14 @@ class DailyModel
 		if (@temp_hash == nil)
 			@temp_hash = YAML::load(@yaml)
 		end
-		@temp_hash[hour.to_i] = usage.to_i
+		@temp_hash[hour] = usage
+		#tmp_name = @name
+		#@name = "flab"
+		#@name = tmp_name
+		@yaml = @temp_hash.to_yaml
 	end
 	def save_yaml
-		@yaml = @temp_hash.to_yaml
+		#@yaml = @temp_hash.to_yaml
 		puts "SAVE_YAML: #{@yaml}"
 		self.save
 	end
@@ -48,17 +54,16 @@ class DailyModel
 		# loads @day hash of hours with data from sdb access with
 		# dm.day[hour].usage
 		hs = {}
-		if (self.yaml != nil)
+		if (@yaml != nil)
 			puts "Loading SimpleDB Model"
-			#hs =  YAML::load(self.yaml)
 			hs =  YAML::load(@yaml)
 		end
-		if (@day.size == 0 && self.yaml == nil)
-			puts "Loading Default Model"
-			hs = open('default_daily_usage.yaml') { |f| YAML.load(f) }
-			@yaml = hs.to_yaml
-			self.save
-		end
+		#if (@day.size == 0 && self.yaml == nil)
+			#puts "Loading Default Model"
+			#hs = open('default_daily_usage.yaml') { |f| YAML.load(f) }
+			#@yaml = hs.to_yaml
+			#self.save
+		#end
 		hs.sort.each { |k,v|
 			h = JS::Hour.new
 			hour_usage = (v * @usage)
@@ -142,6 +147,12 @@ class DailyModel
 		first_month_price = weekly_price * 4.3333333 + ri_one_time
 		puts "Daily RIO: #{daily_rio_price} weekly: #{weekly_price} RI onetime: #{@ri_one_time} #ri #{ri} annual_price: #{annual_price}"
 		return annual_price, first_month_price, ri_one_time
+	end
+	def print_daily_model
+		thash = YAML::load(@yaml)
+		thash.sort.each { |k,v|
+			puts "hour: #{k} usage: #{v}"
+			}
 	end
 	def print_day
 		for hour in @day.keys.sort
