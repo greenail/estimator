@@ -7,7 +7,7 @@ class DailyModel
         property :id,Serial
         property :name, String, :nullable => false
         property :yaml, String, :nullable => false
- 	attr_accessor :usage,:max_instances,:model_min,:day,:ami_type,:model_max,:ami_types,:instance_hours,:weekend_days,:weekend_usage,:ri_one_time,:temp_hash
+ 	attr_accessor :usage,:max_instances,:model_min,:day,:ami_type,:model_max,:ami_types,:instance_hours,:weekend_days,:weekend_usage,:ri_one_time,:temp_hash,:debug
 		
 
 	# TODO: put timezone in monthly model, not sure if needed
@@ -37,7 +37,7 @@ class DailyModel
 	end
 	def save_yaml
 		#@yaml = @temp_hash.to_yaml
-		puts "SAVE_YAML: #{@yaml}"
+		puts "SAVE_YAML: #{@yaml}" if @debug
 		self.save
 	end
 	def get_daily_model(ami_type,usage = 1,model_min = 0,model_max = 1)
@@ -55,7 +55,7 @@ class DailyModel
 		# dm.day[hour].usage
 		hs = {}
 		if (@yaml != nil)
-			puts "Loading SimpleDB Model"
+			puts "Loading SimpleDB Model"  if @debug
 			hs =  YAML::load(@yaml)
 		end
 		#if (@day.size == 0 && self.yaml == nil)
@@ -93,7 +93,7 @@ class DailyModel
 		#iterate from min to max to find best RI number	
 		for i in @model_min.to_i..@max_instances
 			rio_price,first_month_price,ri_one_time = calc_annual_price_with_ri(i)	
-			puts "OPTIMAL RIs: comparing #{best_price} with #{rio_price} for ##{i} RIs"
+			puts "OPTIMAL RIs: comparing #{best_price} with #{rio_price} for ##{i} RIs"  if @debug
 			if (rio_price < best_price)
 				best_price = rio_price
 				optimal_ris = i
@@ -145,7 +145,7 @@ class DailyModel
 		ri_one_time = @ami_type[:RI_y1_install] * ri
 		annual_price = weekly_price * 52 + ri_one_time
 		first_month_price = weekly_price * 4.3333333 + ri_one_time
-		puts "Daily RIO: #{daily_rio_price} weekly: #{weekly_price} RI onetime: #{@ri_one_time} #ri #{ri} annual_price: #{annual_price}"
+		puts "Daily RIO: #{daily_rio_price} weekly: #{weekly_price} RI onetime: #{@ri_one_time} #ri #{ri} annual_price: #{annual_price}"  if @debug
 		return annual_price, first_month_price, ri_one_time
 	end
 	def print_daily_model

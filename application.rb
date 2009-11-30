@@ -25,6 +25,18 @@ class Priz < Merb::Controller
 	#key,skey = getCreds()
         #@sdb = RightAws::SdbInterface.new(key,skey)
 	@estimates = EstimateModel.all(:name.like => "#{@user_name}%")
+	if (params['all'] != nil)
+               @estimates = EstimateModel.all
+        end
+	if (params['delete'])
+                @estimate = EstimateModel.get(params['delete'])
+                raise NotFound unless @estimate
+                if (@estimate.fratricide)
+                        redirect ("/")
+                else
+                        raise InternalServerError
+                end
+        end
     	render
   end
   def login
@@ -46,7 +58,16 @@ class Estimate  < Merb::Controller
 
   def index
 	@user_name = cookies[:user_name]
-    render :estimate
+	if (params['delete'])
+		@estimate = EstimateModel.get(params['delete'])
+		raise NotFound unless @estimate
+		if (@estimate.fratricide)
+			redirect ("/")
+		else
+			raise InternalServerError
+		end
+	end
+	render :estimate
   end
   def create
 	user_name = params['user_name']
@@ -81,16 +102,21 @@ class Configs < Merb::Controller
                 cookies[:estimate_name] = params['estimate']
         end
 	@estimate = EstimateModel.first(:name => @estimate_name)
+	raise NotFound "Could not find the Estimate: #{@estimate_name}" unless @estimate
 	if (params['months'])
 		@estimate.update(:months => params['months'],:month_growth_percentage => params['months_growth_percentage'],:month_start_percentage => params['month_start_percentage'])
-                @months = params['months']
-		@month_growth_percentage = params['month_growth_percentage']
-		@month_start_percentage = params['month_start_percentage']
-        else
-                @months = @estimate.months
-		@month_growth_percentage = @estimate.month_growth_percentage
-		@month_start_percentage = @estimate.month_start_percentage
+                @estimate.months = params['months']
+		@estimate.month_growth_percentage = params['month_growth_percentage']
+		@estimate.month_start_percentage = params['month_start_percentage']
+		tmp_name = @estimate.name
+		@estimate.name = "ldsjfls"
+		@estimate.save
+		@estimate.name = tmp_name
+		@estimate.save
         end
+        @months = @estimate.months
+	@month_growth_percentage = @estimate.month_growth_percentage
+	@month_start_percentage = @estimate.month_start_percentage
 	@configs = Iconf.all(:name.like => "#{@estimate_name}%")
 	@e_total_onetime = 0.0
 	@e_total_monthly = 0.0
@@ -177,6 +203,20 @@ class EstimateModel
 	property :month_start_percentage, String, :nullable => false
 	# configs is a hash of config names
 	property :configs, Object
+	def fratricide  
+		es = Iconf.all(:name.like => "#{@name}%")
+		for e in es
+			puts "deleting instance configs #{e.name}"
+			e.destroy!
+		end
+		es = JS::DailyModel.all(:name.like => "#{@name}%")
+		for e in es
+                        puts "deleting daily model #{e.name}"
+                        e.destroy!
+                end
+		puts "good bye cruel world!"
+		self.destroy!
+	end
 end
 class Iconf
 	# this is the instance configuration
@@ -200,21 +240,3 @@ class Iconf
 		return t
 	end
 end
-#class DailyModel
-	#include DataMapper::Resource
-	#property :id,Serial
-	#property :name, String, :nullable => false
-	#property :yaml, String, :nullable => false
-	#def config
-		#config = {}
-		#config = YAML::load(self.yaml)
-	#end
-	#def get_daily_usage(usage)
-		#model = self.config
-		#for hour in model.keys
-               	 	#hourly_usage = model[hour]
-                	#model[hour] = hourly_usage.to_f * usage.to_f
-        	#end
-        	#return model
-	#end
-#end

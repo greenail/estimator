@@ -3,7 +3,9 @@
 <br>
 <%
 for e in @estimates
-	estimate_name = e.name
-	%><a href=/configs/show_estimate?estimate=<%= estimate_name %>><%= estimate_name %><br></a><%
-end
+	#estimate_name = e.name
+	%><a href=/configs/show_estimate?estimate=<%= e.name %>><%= e.name %> ... 
+	<a href=/?delete=<%=e.id%>>Delete</a>
+	<br></a><%
+	end
 %>
