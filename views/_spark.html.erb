@@ -1,0 +1,20 @@
+<%
+data = []
+chart_url = ""
+min = 0.0
+max = 0.0
+@chart_data.sort.each { |k,values|
+	next if k == 0
+	if(params['debug'])
+        	%><li>M: <%=k%> $<%=values%></li> <%
+	end
+	data.push(values)
+        }
+GoogleChart::LineChart.new('200x50', nil, false) do |lc|
+      	lc.data @chart_name, data, '0000ff'
+	lc.show_legend = false
+	lc.axis :x, :labels => []
+	lc.axis :y, :labels => []
+        chart_url = lc.to_url
+        end
+%><a id=spark href="#spark" ><img src='<%=chart_url%>' style="border-style: none"></a>
