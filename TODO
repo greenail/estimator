@@ -1,5 +1,5 @@
 FIX edit daily model, not sure why save_yaml is not working
-Add delete to Estimate, and delete all children
+******Add delete to Estimate, and delete all children
 put % values as whole number
 change % to whole number % in daily view
 move number of instances above % utilization
@@ -11,6 +11,7 @@ figure out export, may do pdf...
 add chart for number of instances
 add chart for %usage per month
 add chart for each type added, may want toggle to select if this is generated since we may have many instance configs
+
 
 
 
