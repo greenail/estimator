@@ -14,7 +14,7 @@ class Priz < Merb::Controller
 	@user_name = cookies[:user_name]
 	if (params['user_name'] != nil)
 		@user_name = params['user_name'] 
-		puts "LOGIN: #{@user_name}"
+		#puts "LOGIN: #{@user_name}"
 		cookies[:user_name] = @user_name
 	end
 	if (@user_name == nil)
@@ -49,6 +49,14 @@ class Priz < Merb::Controller
   end
 
   
+end
+class Ctest < Merb::Controller
+  def _template_location(action, type = nil, controller = controller_name)
+    controller == "layout" ? "layout.#{action}.#{type}" : "#{action}.#{type}"
+  end
+  def index
+	render :chart_test
+  end
 end
 class Estimate  < Merb::Controller
 
@@ -125,6 +133,7 @@ class Configs < Merb::Controller
 	@e_total_monthly = 0.0
 	@e_month_1 = 0.0
 	@e_month_n = 0.0
+	puts "#{@months} #{@month_growth_percentage} #{@month_start_percentage}"
         render
   end
   def index
@@ -161,7 +170,7 @@ class Configs < Merb::Controller
   def edit_daily
 	@estimate_name = cookies[:estimate_name]
 	@usage = 1
-	puts "#{@estimate_name}-DailyModel"
+	#puts "#{@estimate_name}-DailyModel"
 	@dm = JS::DailyModel.first(:name => "#{@estimate_name}-DailyModel")
 	render :edit_daily_model
   end

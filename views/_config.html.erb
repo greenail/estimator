@@ -16,10 +16,8 @@ rio_price,first_month_price = dm.calc_annual_price_with_ri(optimal_ris)
 # 	Need to add a Monthly Total sans RI one time
 #	Need to add Project Total
 #  	Need to reduce calls to SimpleDB
-if (optimal_ris > @ri_counter)
-	ri_counter = optimal_ris
-	@m_onetime += ri_one_time
-end
+@newmonth_ri_counter += optimal_ris
+@m_onetime += ri_one_time
 @m_monthly += first_month_price - ri_one_time
 %>
 <div class="msg_list">
