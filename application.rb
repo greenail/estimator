@@ -118,6 +118,9 @@ class Configs < Merb::Controller
 	@month_growth_percentage = @estimate.month_growth_percentage
 	@month_start_percentage = @estimate.month_start_percentage
 	@configs = Iconf.all(:name.like => "#{@estimate_name}%")
+	if (@configs.count == 0)
+		redirect("/configs")
+	end
 	@e_total_onetime = 0.0
 	@e_total_monthly = 0.0
 	@e_month_1 = 0.0
