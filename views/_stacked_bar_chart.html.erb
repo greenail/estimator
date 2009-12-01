@@ -1,0 +1,43 @@
+<%
+data = []
+chart_url = ""
+min = 0.0
+max = 0.0
+%><ul id="navlist"> <%
+#@chart_data.sort.each { |k,values|
+	#next if k == 0
+	#if(params['debug'])
+        	#%><li>M: <%=k%> $<%=values%></li> <%
+	#end
+	#if (values < min)
+		#min = values
+	#end
+	#if (values > max)
+		#max = values
+	#end
+	#data.push(values)
+        #}
+%></ul><br/><%
+GoogleChart::BarChart.new('800x200', @chart_name,:vertical, false) do |bc|
+	#bc.stacked = true
+	colors = ['0000ff','c53711']
+	counter = 0
+	@chart_data.each { |name,d|
+		ary = []
+		d.sort.each { |k,values|
+			if (values < min)
+				min = values
+			end
+			if (values > max)
+				max = values
+			end		
+			ary.push(values)
+			}
+      		bc.data name, ary, colors[counter]
+		counter += 1
+		}
+	bc.axis :y, :range => [min,max], :color => 'ff00ff', :font_size => 16, :alignment => :center
+      	bc.axis :x, :range => [1,@months], :color => '00ffff', :font_size => 16, :alignment => :center
+        chart_url = bc.to_url
+        end
+%><img src=<%=chart_url%>>

@@ -31,15 +31,20 @@ end
 @lastmonth_ri_counter = 0
 @ri_history = {0 => 0}
 @price_history = {}
-@cumulative_price_history = {0 => 0.0}
+#@cumulative_price_history = {0 => 0.0}
+@cumulative_price_history = []
 @m_onetime = 0.0
 @m_monthly = 0.0
 @current_onetime = 0.0
 @new_onetime = 0.0
 @new_onetime_history = {}
 @unoptimized_price = 0.0
+@total_unoptimized_price = 0.0
 @utilization_maxed = 0
 @month_history = {}
+@rio_history = []
+@unoptimized_history = []
+@cumulative_unoptimized_history = []
 for @month in 1..@months.to_i
 	@newmonth_ri_counter = 0
 	@usage = @month_start_percentage.to_f + (@month_start_percentage.to_f * @month_growth_percentage.to_f * @month.to_i)
@@ -70,11 +75,21 @@ for @month in 1..@months.to_i
 	</div><%
 	@new_onetime_history[@month] = @new_onetime
 	@price_history[@month] = @m_monthly + @new_onetime
-        if (@cumulative_price_history[@month -1] != nil)
-                @cumulative_price_history[@month] = @cumulative_price_history[@month -1] + @m_monthly + @new_onetime
-        else
-                @cumulative_price_history[@month] =  @m_monthly + @new_onetime
-        end
+	m_total = @m_monthly + @new_onetime
+	@rio_history.push(m_total)
+	@unoptimized_history.push(@unoptimized_price)
+	@total_unoptimized_price += @unoptimized_price
+        #if (@cumulative_price_history[@month -1] != nil)
+                #@cumulative_price_history[@month] = @cumulative_price_history[@month -1] + @m_monthly + @new_onetime
+        #else
+                #@cumulative_price_history[@month] =  @m_monthly + @new_onetime
+        #end
+	@cumulative_unoptimized_history.push(@total_unoptimized_price)
+	if (@cumulative_price_history.size == 0)
+		@cumulative_price_history.push(@m_monthly + @new_onetime)
+	else
+		@cumulative_price_history.push(@cumulative_price_history[@month-2] +  @m_monthly + @new_onetime)
+	end
 	@month_history[@month] = @usage
 	@ri_history[@month] = @new_ri_counter
 end
@@ -90,10 +105,14 @@ Monthly Growth Chart: <br/>
 <b>Savings from RI Optimization:  </b><%= @unoptimized_price - @m_monthly %><br/>
 <b>Savings from Daily Dynamic Scaling: </b><br/>
 <p>
-<% @chart_data = @price_history;@chart_name = "monthly expense" %>
-<%= partial("chart") %><br/>
-<% @chart_data = @cumulative_price_history ; @chart_name = "cumulative spend"%>
-<%= partial("chart") %>
+<%
+@data = [{"Reserved Instance Optimized" => @rio_history},{"Unoptimized Cost" => @unoptimized_history}]
+%>
+<%= partial("line_chart") %>
+<%
+@data = [{"Cumulative Optimized" => @cumulative_price_history},{"Unoptimized Cost" => @cumulative_unoptimized_history}]
+%>
+<%= partial("line_chart") %>
 <table><tr><td>
 <% @chart_data = @new_onetime_history ; @chart_name = "new onetime spend"%>
 <%= partial("bar_chart") %>

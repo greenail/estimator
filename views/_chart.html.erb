@@ -3,6 +3,10 @@ data = []
 chart_url = ""
 min = 0.0
 max = 0.0
+month_label = []
+for i in 0..@months
+	month_label.push(i)
+end
 %><ul id="navlist"> <%
 @chart_data.sort.each { |k,values|
 	next if k == 0
@@ -19,9 +23,13 @@ max = 0.0
         }
 %></ul><br/><%
 GoogleChart::LineChart.new('800x200', @chart_name, false) do |lc|
-      	lc.data @chart_name, data, '0000ff'
-	lc.axis :y, :range => [min,max], :color => 'ff00ff', :font_size => 16, :alignment => :center
-      	lc.axis :x, :range => [1,@months], :color => '00ffff', :font_size => 16, :alignment => :center
+      	lc.data @chart_name, data, 'B20000'
+	lc.show_legend = false
+	lc.fill(:chart, :gradient, :angle => 90, :color => [['BFFFFE',1],['FCF8F8',0]])
+	lc.fill(:background, :gradient, :angle => 90, :color => [['BFFFFE',0],['FCF8F8',1]])
+	lc.axis :y, :range => [min,max], :color => 'B20000', :font_size => 10, :alignment => :center
+      	#lc.axis :x, :range => [1,@months], :color => 'B20000', :font_size => 10, :alignment => :center
+	lc.axis :x, :labels => month_label, :color => 'B20000', :font_size => 10, :alignment => :center
         chart_url = lc.to_url
         end
 %><img src=<%=chart_url%>>

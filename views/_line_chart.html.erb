@@ -1,30 +1,30 @@
 <%
-
-chart = ""
-chart_header = "http://chart.apis.google.com/chart?"
-chart_type = "cht=lc"
-chart_size = "&chs=400x250"
-chart_label = "&chl=Test|Chart"
-# <fill type>,s,<color>|
-chart_background = "&chf=bg,s,E7E7E7"
-chart_color = "&chco=006600"
-# <marker type>,<color>,<data set index>,<data point>,<size>,<priority>|
-chart_marker = "&chm=N*f0*,000000,0,-1,11"
-# <axis 1>,<axis n> x = bottom x, t = top x-axis, y = left y-axis, r = right y-axis
-chart_axis = "&chxt=x"
-# <axis index>:|<label 1>|<label n>|
-chart_axis_label = "0:|Mon|Tue|Wed|Thur|Fri"
-# chart titel + for space | for new line
-chart_title = "&chtt=Daily+Downloads|for+this plugin"
-# chts=FF0000,20 or <color>, <size>
-chart_title_color_and_size = "&chts=000000,16"
-
-chart_data = "&chd=s:Paz9"
-
-chart = chart_header + chart_type + chart_size + chart_label + chart_background + chart_color + chart_marker + chart_axis + chart_axis_label + chart_title  + chart_title_color_and_size + chart_data
-
-%>
-<img src="<%=chart%>">
-
-
-http://chart.apis.google.com/chart?cht=lc&chs=400x250&chf=bg,s,E7E7E7&chd=t:22,55,44,66,77&chco=006600&chm=N*f0*,000000,0,-1,11&chxt=x&chxl=0:|Mon|Tue|Wed|Thur|Fri&chtt=Daily+Downloads|for+this plugin&chts=000000,16
+line_colors = ['ff00ff','00ffff','8F4141','234358','D7D52D']
+min = 0
+max = 0
+chart_url = ""
+GoogleChart::LineChart.new('800x200', @chart_name, false) do |lc|
+for d in @data
+	d.each { |name,data|
+		next unless data
+		lc.data name,data,line_colors.pop
+		t_max = data.sort.last
+		t_min = data.sort.first
+		if (t_min < min)
+			min = t_min
+		end
+		if (t_max > max)
+			max = t_max
+		end
+		}
+	end
+lc.axis :y, :range => [min,max], :color => 'B20000', :font_size => 10, :alignment => :center
+lc.axis :x, :range => [1,@months], :color => 'B20000', :font_size => 10, :alignment => :center
+lc.fill(:chart, :gradient, :angle => 90, :color => [['BFFFFE',1],['FCF8F8',0]])
+lc.fill(:background, :gradient, :angle => 90, :color => [['BFFFFE',0],['FCF8F8',1]])
+for i in 0..@data.size
+	lc.line_style(i,:line_thickness => 10)
+end
+chart_url = lc.to_url
+end
+%><img src=<%=chart_url%>>
