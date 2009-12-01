@@ -18,6 +18,7 @@ rio_price,first_month_price = dm.calc_annual_price_with_ri(optimal_ris)
 #  	Need to reduce calls to SimpleDB
 @newmonth_ri_counter += optimal_ris
 @m_onetime += ri_one_time
+@current_monthly = first_month_price - ri_one_time
 @m_monthly += first_month_price - ri_one_time
 %>
 <div class="msg_list">

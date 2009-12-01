@@ -34,6 +34,7 @@ end
 #@cumulative_price_history = {0 => 0.0}
 @cumulative_price_history = []
 @m_onetime = 0.0
+@current_monthly = 0.0
 @m_monthly = 0.0
 @current_onetime = 0.0
 @new_onetime = 0.0
@@ -47,6 +48,7 @@ end
 @cumulative_unoptimized_history = []
 for @month in 1..@months.to_i
 	@newmonth_ri_counter = 0
+	@current_monthly = 0.0
 	@usage = @month_start_percentage.to_f + (@month_start_percentage.to_f * @month_growth_percentage.to_f * @month.to_i)
 	puts "USAGE: #{@usage}"
 	@usage = 1 if (@usage >= 1 )
@@ -75,21 +77,16 @@ for @month in 1..@months.to_i
 	</div><%
 	@new_onetime_history[@month] = @new_onetime
 	@price_history[@month] = @m_monthly + @new_onetime
-	m_total = @m_monthly + @new_onetime
-	@rio_history.push(m_total)
-	@unoptimized_history.push(@unoptimized_price)
-	@total_unoptimized_price += @unoptimized_price
-        #if (@cumulative_price_history[@month -1] != nil)
-                #@cumulative_price_history[@month] = @cumulative_price_history[@month -1] + @m_monthly + @new_onetime
-        #else
-                #@cumulative_price_history[@month] =  @m_monthly + @new_onetime
-        #end
+	@unoptimized_history.push(@unoptimized_price/12)
+	puts "UNOPTIMIZED PRICE this Month #{@unoptimized_price/12}"
+	@total_unoptimized_price += @unoptimized_price/12
+	puts "TOTAL UNOPTIMIZED PRICE #{@total_unoptimized_price}"
 	@cumulative_unoptimized_history.push(@total_unoptimized_price)
-	if (@cumulative_price_history.size == 0)
-		@cumulative_price_history.push(@m_monthly + @new_onetime)
-	else
-		@cumulative_price_history.push(@cumulative_price_history[@month-2] +  @m_monthly + @new_onetime)
-	end
+	oh_this_sucks = @cumulative_price_history.last
+	oh_this_sucks = 0 if oh_this_sucks == nil
+	puts "Optimized Price #{@current_monthly} + #{@new_onetime} + #{oh_this_sucks} should = #{@m_monthly + @new_onetime + oh_this_sucks}"
+	@cumulative_price_history.push(@current_monthly + @new_onetime + oh_this_sucks)
+	@rio_history.push(@current_monthly+ @new_onetime)
 	@month_history[@month] = @usage
 	@ri_history[@month] = @new_ri_counter
 end
@@ -105,10 +102,12 @@ Monthly Growth Chart: <br/>
 <b>Savings from RI Optimization:  </b><%= @unoptimized_price - @m_monthly %><br/>
 <b>Savings from Daily Dynamic Scaling: </b><br/>
 <p>
+<h1>Cost per Month</h1>
 <%
-@data = [{"Reserved Instance Optimized" => @rio_history},{"Unoptimized Cost" => @unoptimized_history}]
+@data = [{"Reserved Instance Optimized per Month" => @rio_history},{"Unoptimized Cost" => @unoptimized_history}]
 %>
 <%= partial("line_chart") %>
+<h1>Cumulative Cost</h1>
 <%
 @data = [{"Cumulative Optimized" => @cumulative_price_history},{"Unoptimized Cost" => @cumulative_unoptimized_history}]
 %>

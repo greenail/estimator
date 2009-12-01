@@ -23,7 +23,7 @@ lc.axis :x, :range => [1,@months], :color => 'B20000', :font_size => 10, :alignm
 lc.fill(:chart, :gradient, :angle => 90, :color => [['BFFFFE',1],['FCF8F8',0]])
 lc.fill(:background, :gradient, :angle => 90, :color => [['BFFFFE',0],['FCF8F8',1]])
 for i in 0..@data.size
-	lc.line_style(i,:line_thickness => 10)
+	lc.line_style(i,:line_thickness => 5)
 end
 chart_url = lc.to_url
 end

@@ -23,9 +23,9 @@ GoogleChart::BarChart.new('400x200', @chart_name,:vertical, false) do |bc|
       	bc.data "", data, '0000ff'
 	bc.show_legend = false
 	bc.width_spacing_options(:bar_width => 10)
-	bc.axis :y, :range => [min.to_i,max.to_i], :color => 'ff00ff', :font_size => 10, :alignment => :center
+	bc.axis :y, :range => [min.to_i,max.to_i], :color => 'B20000', :font_size => 10, :alignment => :center
 	#bc.axis :y, :labels => names_array,:color => 'ff00ff', :font_size => 10, :alignment => :center
-      	bc.axis :x, :range => [1,@months], :color => '00ffff', :font_size => 10, :alignment => :center
+      	bc.axis :x, :range => [1,@months], :color => 'B20000', :font_size => 10, :alignment => :center
         chart_url = bc.to_url
         end
 %><img src=<%=chart_url%>>
