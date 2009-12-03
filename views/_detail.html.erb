@@ -1,0 +1,75 @@
+<table class=MsoNormalTable border=0 cellspacing=0 cellpadding=0 width=556
+ style='width:417.05pt;margin-left:-1.15pt;border-collapse:collapse'>
+ <tr style='height:15.75pt'>
+
+  <td width=556 nowrap colspan=6 valign=bottom style='width:417.05pt;
+  border:solid windowtext 1.0pt;padding:0in 5.4pt 0in 5.4pt;height:15.75pt'>
+  <p class=MsoNormal align=center style='margin-bottom:0in;margin-bottom:.0001pt;
+  text-align:center;line-height:normal'><b><span style='font-size:12.0pt;
+  color:black'>Configurations</span></b></p>
+  </td>
+ </tr>
+ <tr style='height:15.0pt'>
+  <td width=556 nowrap colspan=6 valign=bottom style='width:417.05pt;
+  border:solid windowtext 1.0pt;border-top:none;background:#DDD9C3;padding:
+  0in 5.4pt 0in 5.4pt;height:15.0pt'>
+  <p class=MsoNormal align=center style='margin-bottom:0in;margin-bottom:.0001pt;
+  text-align:center;line-height:normal'><span style='font-size:10.0pt;
+  color:black'>&nbsp;</span></p>
+  </td>
+
+ </tr>
+ <tr style='height:15.0pt'>
+  <td width=28 nowrap valign=bottom style='width:21.35pt;border:solid windowtext 1.0pt;
+  border-top:none;background:#F2F2F2;padding:0in 5.4pt 0in 5.4pt;height:15.0pt'>
+  <p class=MsoNormal align=center style='margin-bottom:0in;margin-bottom:.0001pt;
+  text-align:center;line-height:normal'><span style='font-size:10.0pt;
+  color:black'>Min</span></p>
+  </td>
+  <td width=31 nowrap valign=bottom style='width:23.3pt;border-top:none;
+  border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:#F2F2F2;padding:0in 5.4pt 0in 5.4pt;height:15.0pt'>
+  <p class=MsoNormal align=center style='margin-bottom:0in;margin-bottom:.0001pt;
+  text-align:center;line-height:normal'><span style='font-size:10.0pt;
+  color:black'>Max</span></p>
+  </td>
+
+  <td width=93 nowrap valign=bottom style='width:69.95pt;border-top:none;
+  border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:#F2F2F2;padding:0in 5.4pt 0in 5.4pt;height:15.0pt'>
+  <p class=MsoNormal align=center style='margin-bottom:0in;margin-bottom:.0001pt;
+  text-align:center;line-height:normal'><span style='font-size:10.0pt;
+  color:black'>Instance Type</span></p>
+  </td>
+  <td width=88 nowrap valign=bottom style='width:65.8pt;border-top:none;
+  border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:#F2F2F2;padding:0in 5.4pt 0in 5.4pt;height:15.0pt'>
+  <p class=MsoNormal align=center style='margin-bottom:0in;margin-bottom:.0001pt;
+  text-align:center;line-height:normal'><span style='font-size:10.0pt;
+  color:black'>Hourly Rate</span></p>
+  </td>
+  <td width=147 nowrap valign=bottom style='width:110.55pt;border-top:none;
+  border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:#F2F2F2;padding:0in 5.4pt 0in 5.4pt;height:15.0pt'>
+  <p class=MsoNormal align=center style='margin-bottom:0in;margin-bottom:.0001pt;
+  text-align:center;line-height:normal'><span style='font-size:10.0pt;
+  color:black'>Reserve Instance Rate</span></p>
+
+  </td>
+  <td width=168 nowrap valign=bottom style='width:126.1pt;border-top:none;
+  border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:#F2F2F2;padding:0in 5.4pt 0in 5.4pt;height:15.0pt'>
+  <p class=MsoNormal align=center style='margin-bottom:0in;margin-bottom:.0001pt;
+  text-align:center;line-height:normal'><span style='font-size:10.0pt;
+  color:black'>Peak Instance Hours per Week</span></p>
+  </td>
+ </tr>
+<%
+@estimate.configs.each do |name,@config|
+	%>
+	<%= partial("detail_row") %>
+	<%	
+end
+%>
+</table>
+

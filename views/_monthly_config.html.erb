@@ -1,6 +1,7 @@
-<form action=/configs/show_estimate method=post>
+<form action=/configs/show_estimate method=get>
 Months to estimate:  <input type=text size=3 name=months value=<%= @months %>><br />
 Month 1 Utilization: <input type=text size=3 name=month_start_percentage value=<%= @month_start_percentage %>><br />
 Monthly Growth Rate: <input type=text size=3 name=month_growth_percentage value=<%= @month_growth_percentage %>><br />
 <input type=submit value="Update Monthly Parameters">
+<input type=hidden value="<%= @estimate.id %>" name=eid>
 </form>

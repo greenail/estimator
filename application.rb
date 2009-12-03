@@ -55,8 +55,20 @@ class Ctest < Merb::Controller
     controller == "layout" ? "layout.#{action}.#{type}" : "#{action}.#{type}"
   end
   def index
+	@estimate_name = "jesse-Patni-insurance"
+	@configs = Iconf.all(:name.like => "#{@estimate_name}%")
 	render :chart_test
   end
+end
+class Exceptions
+  def _template_location(action, type = nil, controller = controller_name)
+    controller == "layout" ? "layout.#{action}.#{type}" : "#{action}.#{type}"
+  end
+
+  #def not_found
+#	#return standard_error 
+#	render
+#  end
 end
 class Estimate  < Merb::Controller
 
@@ -91,9 +103,8 @@ class Estimate  < Merb::Controller
 	@dm = JS::DailyModel.new
 	@dm.name = "#{estimate_name}-DailyModel"
 	@dm.save
-	# warm sdb and load default model 
-	#@dm.get_daily_model('m1small',1,1,1)
-	redirect ("/configs/show_estimate")
+	cookies[:estimate_id] = @estimate.id
+	redirect ("/configs/show_estimate/#{@estimate.id}")
     #render
   end
 end
@@ -104,14 +115,11 @@ class Configs < Merb::Controller
     controller == "layout" ? "layout.#{action}.#{type}" : "#{action}.#{type}"
   end
   def show_estimate
-        @estimate_name = cookies[:estimate_name]
-        if (params['estimate'])
-                @estimate_name = params['estimate']
-                cookies[:estimate_name] = params['estimate']
-        end
-	@estimate = EstimateModel.first(:name => @estimate_name)
-	raise NotFound "Could not find the Estimate: #{@estimate_name}" unless @estimate
+	id = params['id']
+	id = params['eid'] if params['eid']
+	@estimate = EstimateModel.get(id)
 	if (params['months'])
+		@estimate = EstimateModel.get(params['eid'])
 		@estimate.update(:months => params['months'],:month_growth_percentage => params['months_growth_percentage'],:month_start_percentage => params['month_start_percentage'])
                 @estimate.months = params['months']
 		@estimate.month_growth_percentage = params['month_growth_percentage']
@@ -122,18 +130,35 @@ class Configs < Merb::Controller
 		@estimate.name = tmp_name
 		@estimate.save
         end
+	if (@estimate == nil)
+		@estimate = EstimateModel.get(cookies[:estimate_id])
+	else
+		cookies[:estimate_id] = @estimate.id
+	end
+	raise NotFound  unless @estimate != nil
+        @estimate.configs = {}
+        cookies[:estimate_name] = @estimate.name
+        cookies[:estimate_id] = @estimate.id
         @months = @estimate.months
 	@month_growth_percentage = @estimate.month_growth_percentage
 	@month_start_percentage = @estimate.month_start_percentage
-	@configs = Iconf.all(:name.like => "#{@estimate_name}%")
+	@configs = Iconf.all(:name.like => "#{@estimate.name}%")
 	if (@configs.count == 0)
-		redirect("/configs")
+		#redirect("/configs")
 	end
 	@e_total_onetime = 0.0
 	@e_total_monthly = 0.0
 	@e_month_1 = 0.0
 	@e_month_n = 0.0
-	puts "#{@months} #{@month_growth_percentage} #{@month_start_percentage}"
+	#puts "#{@months} #{@month_growth_percentage} #{@month_start_percentage}"
+	dmname = "#{@estimate.name}-DailyModel"
+	@dm = JS::DailyModel.first(:name => dmname)
+	puts "DM Name: #{dmname}"
+	# ugly hack
+	if (@dm == nil)
+		@dm = JS::DailyModel.first(:name => dmname)
+	end
+	raise NotFound  unless @dm != nil
         render
   end
   def index
@@ -144,15 +169,13 @@ class Configs < Merb::Controller
 	@estimate_name = cookies[:estimate_name]
 	name = params['name']
 	ic = Iconf.create(:name => "#{@estimate_name}-#{name}",:type => params['type'],:min_q => params['min_q'],:max_q => params['max_q'],:days => params['days'],:weekend_usage => params['weekend_usage'])
-	redirect ("/configs/show_estimate")
+	redirect ("/configs/show_estimate/#{cookies[:estimate_id]}")
   end
   def update_config
-	@estimate_name = cookies[:estimate_name]
         name = params['name']
 	ic = Iconf.first(:name => name)
         ic.update(:name => name,:type => params['type'],:min_q => params['min_q'],:max_q => params['max_q'],:days => params['days'],:weekend_usage => params['weekend_usage'])
-	#puts "DAYS: #{params['days']} Result: #{result}"
-        redirect ("/configs/show_estimate")
+        redirect ("/configs/show_estimate/#{params['eid']}")
   end
   def delete_config
 	ic = Iconf.first(:name => params['config_key'])
@@ -160,7 +183,6 @@ class Configs < Merb::Controller
 	redirect ("/configs/show_estimate")
   end
   def edit_config
-	#@dy = DyModel.new
 	@estimate_name = cookies[:estimate_name]
 	@config_name = params['config_key']
 	@c = Iconf.first(:name =>@config_name)
@@ -168,15 +190,15 @@ class Configs < Merb::Controller
 	render :edit_config
   end
   def edit_daily
-	@estimate_name = cookies[:estimate_name]
+	@estimate = EstimateModel.get(cookies[:estimate_id])
 	@usage = 1
-	#puts "#{@estimate_name}-DailyModel"
-	@dm = JS::DailyModel.first(:name => "#{@estimate_name}-DailyModel")
+	#puts "#{@estimate.name}-DailyModel"
+	@dm = JS::DailyModel.first(:name => "#{@estimate.name}-DailyModel")
 	render :edit_daily_model
   end
   def update_daily_model
-	@estimate_name = cookies[:estimate_name]
-	@dm = JS::DailyModel.first(:name => "#{@estimate_name}-DailyModel")
+	@estimate = EstimateModel.get(cookies[:estimate_id])
+	@dm = JS::DailyModel.first(:name => "#{@estimate.name}-DailyModel")
 	for name in params.keys.sort
 		if (name =~ /^usage/)
 			nada, hour = name.split("-")
@@ -189,7 +211,7 @@ class Configs < Merb::Controller
 	@dm.save
 	@dm.name = tmp_name
 	@dm.save
-	redirect ("/configs/show_estimate")
+	redirect ("/configs/show_estimate/#{@estimate.id}")
 	
   end
 
@@ -215,6 +237,7 @@ class EstimateModel
 	property :month_start_percentage, String, :nullable => false
 	# configs is a hash of config names
 	property :configs, Object
+	attr_accessor :configs
 	def fratricide  
 		es = Iconf.all(:name.like => "#{@name}%")
 		for e in es
@@ -240,6 +263,7 @@ class Iconf
         property :max_q, String, :nullable => false
         property :days, String, :nullable => false
         property :weekend_usage, String, :nullable => false
+	attr_accessor :week_hours,:rio_total,:rio_hourly,:rio_onetime,:od_total,:od_hourly
 	#property :config, Object
 	def to_hash
 		t = {}

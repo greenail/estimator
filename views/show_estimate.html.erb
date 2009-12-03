@@ -17,6 +17,7 @@ Dynamic Costs for Configuration<br/>
 <div id="navcontainer">
 <ul id="navlist" class="idTabs">
 <li><a href="#totals">Totals</a></li>
+<li><a href="#Section1">Details</a></li>
 <%
 for month in 1..@months.to_i
 	%><li><a href="#<%=month%>">Month: <%=month%></a></li><%
@@ -126,6 +127,7 @@ Monthly Growth Chart: <br/>
 %>
 </p>
 </div>
+<%= partial("detail") %>
 
 </body>
 </html>

@@ -1,0 +1,68 @@
+<%
+@ami_types = open('ami_types.yaml') { |f| YAML.load(f) }
+ami_type = @ami_types[@config.type.to_sym]
+%>
+ <tr style='height:15.0pt'>
+  <td width=28 nowrap valign=bottom style='width:21.35pt;border:solid windowtext 1.0pt;
+  border-top:none;background:#FFFFCC;padding:0in 5.4pt 0in 5.4pt;height:15.0pt'>
+  <p class=MsoNormal align=center style='margin-bottom:0in;margin-bottom:.0001pt;
+  text-align:center;line-height:normal'><span style='font-size:10.0pt;
+  color:black'><%= @config.min_q%></span></p>
+
+  </td>
+  <td width=31 nowrap valign=bottom style='width:23.3pt;border-top:none;
+  border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:#FFFFCC;padding:0in 5.4pt 0in 5.4pt;height:15.0pt'>
+  <p class=MsoNormal align=center style='margin-bottom:0in;margin-bottom:.0001pt;
+  text-align:center;line-height:normal'><span style='font-size:10.0pt;
+  color:black'><%= @config.max_q %></span></p>
+  </td>
+  <td width=93 nowrap valign=bottom style='width:69.95pt;border-top:none;
+  border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:#F2F2F2;padding:0in 5.4pt 0in 5.4pt;height:15.0pt'>
+  <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;text-indent:
+  10.0pt;line-height:normal'><span style='font-size:10.0pt;color:black'><%= @config.type%></span></p>
+  </td>
+  <td width=88 nowrap valign=bottom style='width:65.8pt;border-top:none;
+  border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:#F2F2F2;padding:0in 5.4pt 0in 5.4pt;height:15.0pt'>
+
+  <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+  normal'><span style='font-size:10.0pt;color:black'> <%= ami_type[:OD_hourly] %> </span></p>
+  </td>
+  <td width=147 nowrap valign=bottom style='width:110.55pt;border-top:none;
+  border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:#C5D9F1;padding:0in 5.4pt 0in 5.4pt;height:15.0pt'>
+  <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+  normal'><span style='font-size:10.0pt;color:black'> <%= ami_type[:RI_hourly] %> </span></p>
+  </td>
+  <td width=168 nowrap valign=bottom style='width:126.1pt;border-top:none;
+  border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:#C5D9F1;padding:0in 5.4pt 0in 5.4pt;height:15.0pt'>
+  <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+  normal'><span style='font-size:10.0pt;color:black'> <%= @config.week_hours%> <%= @config.od_total %><%= @config.rio_onetime%></span></p>
+
+  </td>
+  <td width=168 nowrap valign=bottom style='width:126.1pt;border-top:none;
+  border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:#C5D9F1;padding:0in 5.4pt 0in 5.4pt;height:15.0pt'>
+  <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+  normal'><span style='font-size:10.0pt;color:black'>od_total <%= @config.od_total %> </span></p>
+
+  </td>
+  <td width=168 nowrap valign=bottom style='width:126.1pt;border-top:none;
+  border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:#C5D9F1;padding:0in 5.4pt 0in 5.4pt;height:15.0pt'>
+  <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+  normal'><span style='font-size:10.0pt;color:black'>rio_onetime <%= @config.rio_onetime%></span></p>
+
+  </td>
+  <td width=168 nowrap valign=bottom style='width:126.1pt;border-top:none;
+  border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  background:#C5D9F1;padding:0in 5.4pt 0in 5.4pt;height:15.0pt'>
+  <p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+  normal'><span style='font-size:10.0pt;color:black'>rio_total <%= @config.rio_total %></span></p>
+
+  </td>
+ </tr>
+
