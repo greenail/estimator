@@ -23,7 +23,9 @@ class DailyModel
 		
 	end
 	def get_types
-       		@ami_types = open('ami_types.yaml') { |f| YAML.load(f) }
+		#if (@ami_types == nil)
+       			@ami_types = open('ami_types.yaml') { |f| YAML.load(f) }
+		#end
 	end
 	def put_hour(hour,usage)
 		if (@temp_hash == nil)
@@ -37,7 +39,7 @@ class DailyModel
 	end
 	def save_yaml
 		#@yaml = @temp_hash.to_yaml
-		puts "SAVE_YAML: #{@yaml}" if @debug
+		#puts "SAVE_YAML: #{@yaml}" if @debug
 		self.save
 	end
 	def get_daily_model(ami_type,usage = 1,model_min = 0,model_max = 1)
@@ -55,7 +57,7 @@ class DailyModel
 		# dm.day[hour].usage
 		hs = {}
 		if (@yaml != nil)
-			puts "Loading SimpleDB Model"  if @debug
+			#puts "Loading SimpleDB Model"  if @debug
 			hs =  YAML::load(@yaml)
 		end
 		#if (@day.size == 0 && self.yaml == nil)
@@ -93,12 +95,16 @@ class DailyModel
 		#iterate from min to max to find best RI number	
 		for i in @model_min.to_i..@max_instances
 			rio_price,first_month_price,ri_one_time = calc_annual_price_with_ri(i)	
-			puts "OPTIMAL RIs: comparing #{best_price} with #{rio_price} for ##{i} RIs"  if @debug
+			#puts "OPTIMAL RIs: comparing #{best_price} with #{rio_price} for ##{i} RIs"  if @debug
 			if (rio_price < best_price)
 				best_price = rio_price
 				optimal_ris = i
 			end
 		end
+		@day.sort.each { |k,hour|
+                        rio_price = optimized_ri_price(hour.instances,optimal_ris)
+			hour.rio_price = rio_price
+			}
 		return optimal_ris
 	end
 	def calc_annual_unoptimiezed_price
@@ -114,19 +120,23 @@ class DailyModel
 		#puts "Weekly Price: #{weekly_price}"
 		annual_price = weekly_price * 52
 	end
+	def optimized_ri_price(instances,ri)
+		rio_price = 0.0
+		if (instances >= ri)
+                        od_instances =  instances - ri
+                        ri_price = ri * @ami_type[:RI_hourly].to_f
+                        od_price = od_instances * @ami_type[:OD_hourly].to_f
+                        rio_price = ri_price + od_price
+                else
+                        rio_price =  hour.instances * @ami_type[:RI_hourly].to_f
+                end
+		return rio_price
+	end
 	def calc_annual_price_with_ri(ri)
 		daily_rio_price = 0.0
 		print "\n"
 		@day.sort.each { |k,hour|
-			rio_price = 0.0
-			if (hour.instances >= ri)
-				od_instances =  hour.instances - ri
-				ri_price = ri * @ami_type[:RI_hourly].to_f
-				od_price = od_instances * @ami_type[:OD_hourly].to_f
-				rio_price = ri_price + od_price
-			else
-				rio_price =  hour.instances * @ami_type[:RI_hourly].to_f
-			end
+			rio_price = optimized_ri_price(hour.instances,ri)
 			#print "Hour #{k} price: #{rio_price}"
 			daily_rio_price += rio_price
 			# TODO: figure out how to set this for optimal ri instead of for each iteration of optimal ri test
@@ -145,7 +155,7 @@ class DailyModel
 		ri_one_time = @ami_type[:RI_y1_install] * ri
 		annual_price = weekly_price * 52 + ri_one_time
 		first_month_price = weekly_price * 4.3333333 + ri_one_time
-		puts "Daily RIO: #{daily_rio_price} weekly: #{weekly_price} RI onetime: #{@ri_one_time} #ri #{ri} annual_price: #{annual_price}"  if @debug
+		#puts "Daily RIO: #{daily_rio_price} weekly: #{weekly_price} RI onetime: #{@ri_one_time} #ri #{ri} annual_price: #{annual_price}"  if @debug
 		return annual_price, first_month_price, ri_one_time
 	end
 	def print_daily_model

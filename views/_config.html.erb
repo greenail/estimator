@@ -10,16 +10,16 @@
 #dm.put_config(config)
 optimal_ris = @dm.calc_optimal_ris
 #puts "OPTIMAL RIS #{optimal_ris}"
-annual_price,first_month_price,ri_one_time = @dm.calc_annual_price_with_ri(optimal_ris)
+annual_price,first_month_price,rio_install_1y = @dm.calc_annual_price_with_ri(optimal_ris)
 rio_price,first_month_price = @dm.calc_annual_price_with_ri(optimal_ris)
 # TODO: need to figure out difference between previous month's RI purchase if we add an RI.
 # 	Need to add a Monthly Total sans RI one time
 #	Need to add Project Total
 #  	Need to reduce calls to SimpleDB
 @newmonth_ri_counter += optimal_ris
-@m_onetime += ri_one_time
-@current_monthly = first_month_price - ri_one_time
-@m_monthly += first_month_price - ri_one_time
+@m_onetime += rio_install_1y
+@current_monthly = first_month_price - rio_install_1y
+@m_monthly += first_month_price - rio_install_1y
 %>
 <div class="msg_list">
 <p class="msg_head"><%= config.name.split("-").last %>: details 
@@ -96,10 +96,17 @@ instances_per_weekend_hour = config.min_q
 instances_per_weekend_hour = config.max_q.to_i * config.weekend_usage.to_f * @usage if config.max_q.to_i * config.weekend_usage.to_f * @usage.to_f > config.min_q.to_i
 weekend_hours = instances_per_weekend_hour.to_i * 24 * weekend_days.to_i
 config.week_hours = (hour_total.to_i * config.days.to_i) + weekend_hours.to_i
-puts "weekday hours = #{hour_total.to_i * config.days.to_i} weekend hours = #{weekend_hours} Week Hours = #{config.week_hours}"
-config.od_total = @unoptimized_price
-config.rio_onetime =  ri_one_time
-config.rio_total = @m_monthly
+#puts "weekday hours = #{hour_total.to_i * config.days.to_i} weekend hours = #{weekend_hours} Week Hours = #{config.week_hours}"
+ami_types = @dm.get_types
+ami_type = ami_types[config.type.to_sym]
+@month_od_price = ami_type[:OD_hourly] * config.week_hours * 52 / 12
+config.od_total = 0.0 if config.od_total == nil
+config.od_total += @month_od_price
+config.rio_total_hourly = 0.0 if config.rio_total_hourly == nil
+config.rio_total_hourly += @current_monthly
+config.rio_install_1y =  rio_install_1y
+#config.rio_total_1y = @m_monthly + rio_install_1y
+config.rio_count = optimal_ris
 @estimate.configs[config.name] = config
 %>
 <td>$<%=total%></td>

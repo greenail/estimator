@@ -263,7 +263,7 @@ class Iconf
         property :max_q, String, :nullable => false
         property :days, String, :nullable => false
         property :weekend_usage, String, :nullable => false
-	attr_accessor :week_hours,:rio_total,:rio_hourly,:rio_onetime,:od_total,:od_hourly
+	attr_accessor :week_hours,:rio_total,:rio_total_hourly,:rio_count,:od_total,:instance_hours,:od_peak_month,:rio_total_1y,:rio_total_3y,:rio_install_1y,:rio_install_3y
 	#property :config, Object
 	def to_hash
 		t = {}
