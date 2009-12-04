@@ -99,7 +99,7 @@ config.week_hours = (hour_total.to_i * config.days.to_i) + weekend_hours.to_i
 #puts "weekday hours = #{hour_total.to_i * config.days.to_i} weekend hours = #{weekend_hours} Week Hours = #{config.week_hours}"
 ami_types = @dm.get_types
 ami_type = ami_types[config.type.to_sym]
-@month_od_price = ami_type[:OD_hourly] * config.week_hours * 52 / 12
+@month_od_price = ami_type[:OD_hourly].to_f * config.week_hours.to_i * 52 / 12
 config.od_total = 0.0 if config.od_total == nil
 config.od_total += @month_od_price
 config.rio_total_hourly = 0.0 if config.rio_total_hourly == nil

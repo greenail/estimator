@@ -46,14 +46,14 @@ ami_type = @ami_types[@config.type.to_sym]
   padding:0in 5.4pt 0in 5.4pt;height:15.0pt'>
   <p class=MsoNormal align=center style='margin-bottom:0in;margin-bottom:.0001pt;
   text-align:center;line-height:normal'><span style='font-size:10.0pt;
-  font-family:"Estrangelo Edessa";color:black'><%= ami_type[:OD_hourly]*@config.week_hours*52/12 %></span></p>
+  font-family:"Estrangelo Edessa";color:black'><%= currencify(ami_type[:OD_hourly]*@config.week_hours*52/12) %></span></p>
   </td>
   <td width=108 valign=top style='width:81.0pt;border:none;background:#C4BC96;
   padding:0in 5.4pt 0in 5.4pt;height:15.0pt'>
 
   <p class=MsoNormal align=center style='margin-bottom:0in;margin-bottom:.0001pt;
   text-align:center;line-height:normal'><span style='font-size:10.0pt;
-  font-family:"Estrangelo Edessa";color:black'><%= @config.od_total%></span></p>
+  font-family:"Estrangelo Edessa";color:black'><%= currencify(@config.od_total)%></span></p>
   </td>
   <td width=120 valign=top style='width:1.25in;border:none;background:#C4BC96;
   padding:0in 5.4pt 0in 5.4pt;height:15.0pt'>
@@ -65,14 +65,14 @@ ami_type = @ami_types[@config.type.to_sym]
   padding:0in 5.4pt 0in 5.4pt;height:15.0pt'>
   <p class=MsoNormal align=center style='margin-bottom:0in;margin-bottom:.0001pt;
   text-align:center;line-height:normal'><span style='font-size:10.0pt;
-  font-family:"Estrangelo Edessa";color:black'><%= @config.rio_install_1y%></span></p>
+  font-family:"Estrangelo Edessa";color:black'><%= currencify(@config.rio_install_1y)%></span></p>
   </td>
   <td width=114 valign=top style='width:85.5pt;border:none;background:#C4BC96;
   padding:0in 5.4pt 0in 5.4pt;height:15.0pt'>
 
   <p class=MsoNormal align=center style='margin-bottom:0in;margin-bottom:.0001pt;
   text-align:center;line-height:normal'><span style='font-size:10.0pt;
-  font-family:"Estrangelo Edessa";color:black'><%= @config.rio_total_hourly + @config.rio_install_1y %></span></p>
+  font-family:"Estrangelo Edessa";color:black'><%= currencify(@config.rio_total_hourly + @config.rio_install_1y) %></span></p>
   </td>
   <td width=120 valign=top style='width:1.25in;border:none;border-right:solid windowtext 1.0pt;
   background:#C4BC96;padding:0in 5.4pt 0in 5.4pt;height:15.0pt'>

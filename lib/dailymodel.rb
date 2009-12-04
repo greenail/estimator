@@ -128,7 +128,7 @@ class DailyModel
                         od_price = od_instances * @ami_type[:OD_hourly].to_f
                         rio_price = ri_price + od_price
                 else
-                        rio_price =  hour.instances * @ami_type[:RI_hourly].to_f
+                        rio_price =  instances * @ami_type[:RI_hourly].to_f
                 end
 		return rio_price
 	end

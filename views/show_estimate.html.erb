@@ -117,7 +117,8 @@ Monthly Growth Chart: <br/>
 <div id="totals">
 <b>Total Monthly Recurring For <%= @months %> Months:</b> <%=currencify(@m_monthly) %><br/>
 <b>Total Reserved Instance Purchase Cost Over <%= @months %> Months: </b><%= currencify(@current_onetime) %><br/>
-<b>Savings from RI Optimization:  </b><%= currencify(@unoptimized_price - @m_monthly) %><br/>
+<b>Total On Demand Price <%= currencify(@unoptimized_price) %></b></br>
+<b>Savings from RI Optimization:  </b><%= currencify(@unoptimized_price - (@m_monthly + @current_onetime)) %><br/>
 <b>Savings from Daily Dynamic Scaling: </b><br/>
 <p>
 <h1>Cost per Month</h1>
