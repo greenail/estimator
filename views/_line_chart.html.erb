@@ -3,7 +3,7 @@ line_colors = ['ff00ff','00ffff','8F4141','234358','D7D52D']
 min = 0
 max = 0
 chart_url = ""
-GoogleChart::LineChart.new('800x200', @chart_name, false) do |lc|
+GoogleChart::LineChart.new('600x150', @chart_name, false) do |lc|
 for d in @data
 	d.each { |name,data|
 		next unless data

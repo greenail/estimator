@@ -51,6 +51,7 @@ end
 @price_history = {}
 #@cumulative_price_history = {0 => 0.0}
 @cumulative_price_history = []
+@no_install_history = []
 @m_onetime = 0.0
 @current_monthly = 0.0
 @m_monthly = 0.0
@@ -67,6 +68,7 @@ end
 for @month in 1..@months.to_i
 	@newmonth_ri_counter = 0
 	@current_monthly = 0.0
+	@total_current_monthly = 0.0
 	@usage = @month_start_percentage.to_f + (@month_start_percentage.to_f * @month_growth_percentage.to_f * @month.to_i)
 	puts "USAGE: #{@usage}"
 	@usage = 1 if (@usage >= 1 )
@@ -82,6 +84,7 @@ for @month in 1..@months.to_i
         	<%
 	end
 	%>
+	Monthly Optimized Cost: <%= @total_current_monthly %>
 	Cumulative Hourly Cost: <%= @m_monthly %><br/>
 	Cumulative Reserved Instance cost: <%= @m_onetime %><br/>
 	<%
@@ -103,8 +106,9 @@ for @month in 1..@months.to_i
 	oh_this_sucks = @cumulative_price_history.last
 	oh_this_sucks = 0 if oh_this_sucks == nil
 	puts "Optimized Price #{@current_monthly} + #{@new_onetime} + #{oh_this_sucks} should = #{@m_monthly + @new_onetime + oh_this_sucks}"
-	@cumulative_price_history.push(@current_monthly + @new_onetime + oh_this_sucks)
-	@rio_history.push(@current_monthly+ @new_onetime)
+	@cumulative_price_history.push(@total_current_monthly + @new_onetime + oh_this_sucks)
+	@no_install_history.push(@total_current_monthly)
+	@rio_history.push(@total_current_monthly+ @new_onetime)
 	@month_history[@month] = @usage
 	@ri_history[@month] = @new_ri_counter
 end
@@ -115,27 +119,37 @@ Monthly Growth Chart: <br/>
 <%= partial("spark") %>
 </div>
 <div id="totals">
+<table width=100%><tr><td>
+<h1> Totals </h1>
+<b>Total On Demand Price <%= currencify(@unoptimized_price) %></b></br>
 <b>Total Monthly Recurring For <%= @months %> Months:</b> <%=currencify(@m_monthly) %><br/>
 <b>Total Reserved Instance Purchase Cost Over <%= @months %> Months: </b><%= currencify(@current_onetime) %><br/>
-<b>Total On Demand Price <%= currencify(@unoptimized_price) %></b></br>
+<b>Total Reserved Instance Optimized Price <%= currencify(@m_monthly + @current_onetime) %></b></br>
+<h1> Savings </h1>
 <b>Savings from RI Optimization:  </b><%= currencify(@unoptimized_price - (@m_monthly + @current_onetime)) %><br/>
 <b>Savings from Daily Dynamic Scaling: </b><br/>
-<p>
-<h1>Cost per Month</h1>
-<%
-@data = [{"Reserved Instance Optimized per Month" => @rio_history},{"Unoptimized Cost" => @unoptimized_history}]
-%>
-<%= partial("line_chart") %>
-<h1>Cumulative Cost</h1>
-<%
-@data = [{"Cumulative Optimized" => @cumulative_price_history},{"Unoptimized Cost" => @cumulative_unoptimized_history}]
-%>
-<%= partial("line_chart") %>
-<table><tr><td>
-<% @chart_data = @new_onetime_history ; @chart_name = "new onetime spend"%>
-<%= partial("bar_chart") %>
 </td>
 <td>
+<h2>Cost per Month</h2>
+<%
+@data = [{"Optimized" => @rio_history},{"Unoptimized" => @unoptimized_history}]
+%>
+<%= partial("line_chart") %>
+<h2>Cumulative Cost</h2>
+<%
+@data = [{"Optimized" => @cumulative_price_history},{"Unoptimized" => @cumulative_unoptimized_history}]
+%>
+<%= partial("line_chart") %>
+<h2>Monthly less install</h2>
+<%
+@data = [{"Optimized" => @no_install_history},{"Unoptimized" => @unoptimized_history}]
+%>
+<%= partial("line_chart") %>
+</td></tr>
+<tr>
+<td colspan=2>
+<% @chart_data = @new_onetime_history ; @chart_name = "new onetime spend"%>
+<%= partial("bar_chart") %>
 <% @chart_data = @ri_history ; @chart_name = "New Reserved Instances per Month"%>
 <%= partial("bar_chart") %>
 </td></tr></table>
@@ -143,7 +157,8 @@ Monthly Growth Chart: <br/>
 #@chart_name = "Reserved Instance Trends"
 #@chart_data = {"Total New Reserved Instances per Month" => @ri_history,"new onetime spend" => @new_onetime_history} 
 %>
-</p>
+</td></tr>
+</table>
 </div>
 <%= partial("detail") %>
 

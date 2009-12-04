@@ -19,6 +19,7 @@ rio_price,first_month_price = @dm.calc_annual_price_with_ri(optimal_ris)
 @newmonth_ri_counter += optimal_ris
 @m_onetime += rio_install_1y
 @current_monthly = first_month_price - rio_install_1y
+@total_current_monthly += @current_monthly
 @m_monthly += first_month_price - rio_install_1y
 %>
 <div class="msg_list">

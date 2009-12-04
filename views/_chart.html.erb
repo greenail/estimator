@@ -22,7 +22,7 @@ end
 	data.push(values)
         }
 %></ul><br/><%
-GoogleChart::LineChart.new('800x200', @chart_name, false) do |lc|
+GoogleChart::LineChart.new('600x150', @chart_name, false) do |lc|
       	lc.data @chart_name, data, 'B20000'
 	lc.show_legend = false
 	lc.fill(:chart, :gradient, :angle => 90, :color => [['BFFFFE',1],['FCF8F8',0]])
