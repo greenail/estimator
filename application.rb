@@ -156,6 +156,7 @@ class Configs < Merb::Controller
 	puts "DM Name: #{dmname}"
 	# ugly hack
 	if (@dm == nil)
+		sleep 1
 		@dm = JS::DailyModel.first(:name => dmname)
 	end
 	raise NotFound  unless @dm != nil
