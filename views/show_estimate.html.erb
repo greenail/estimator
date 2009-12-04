@@ -84,9 +84,10 @@ for @month in 1..@months.to_i
         	<%
 	end
 	%>
-	Monthly Optimized Cost: <%= @total_current_monthly %>
-	Cumulative Hourly Cost: <%= @m_monthly %><br/>
-	Cumulative Reserved Instance cost: <%= @m_onetime %><br/>
+	Monthly Unoptimized Cost: <%= currencify(@unoptimized_price/12) %><br/>
+	Monthly Optimized Cost: <%= currencify(@total_current_monthly) %><br/>
+	Cumulative Hourly Cost: <%= currencify(@m_monthly) %><br/>
+	Cumulative Reserved Instance cost: <%= currencify(@m_onetime) %><br/>
 	<%
 	if (@m_onetime != 0)
 		@new_onetime =  @m_onetime - @current_onetime 
@@ -94,7 +95,7 @@ for @month in 1..@months.to_i
 		@lastmonth_ri_counter = @newmonth_ri_counter
 		@current_onetime = @m_onetime
 	end	
-	%>New Reserved Instance Purchase cost: <%= @new_onetime %><br/>
+	%>New Reserved Instance Purchase cost: <%= currencify(@new_onetime) %><br/>
 	</div><%
 	@new_onetime_history[@month] = @new_onetime
 	@price_history[@month] = @m_monthly + @new_onetime
