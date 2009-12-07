@@ -29,12 +29,12 @@ $(document).ready(function()
 </script>
 </head>
 <body>
+<div id="wrapper">
+<div id="header">
 <table><tr>
 <td><img src=http://media.amazonwebservices.com/logo_aws.gif></td>
 <td><h1>Dynamic Scaling Estimator</h1></td>
 </tr>
-</table>
-<table>
 <tr>
 <th>Welcome: <%= cookies[:user_name] %></th>
 <%
@@ -49,8 +49,9 @@ if (@estimate_name != nil || params['estimate'] != nil)
         <%
 end
 %>
-<tr>
-<th><a href=/>Home</a></th><th><a href=/estimate>New Estimate</a></th>
-<th><a href=/priz/logout>Logout</a></th>
+</tr><tr>
+<td><a href=/>Home</a></td><td><a href=/estimate>New Estimate</a></td>
+<td><a href=/priz/logout>Logout</a></td>
 </tr>
 </table>
+</div>

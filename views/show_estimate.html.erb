@@ -1,47 +1,33 @@
-<%= partial( "header" ) %>
-Dynamic Costs for Configuration<br/>
-<table cellspacing=5>
-<tr>
-<td>
-<div class=foo></div>
-<div class=bar>
-<%= partial("monthly_config") %>
-</div>
-</td>
-<td>
-<a href=/configs/edit_daily>Edit Weekday Usage Model</a><br />
-<a href=/configs>Add Instance Configuration</a><br />
-</td>
-</tr>
-</table>
-<div id="navcontainer">
-<ul id="navlist" class="idTabs">
-<li><a href="#totals">Totals</a></li>
-<li><a href="#Section1">Details</a></li>
 <%
 def currencify(number, options={})
   # :currency_before => false puts the currency symbol after the number
   # default format: $12,345,678.90
   options = {:currency_symbol => "$", :delimiter => ",", :decimal_symbol => ".", :currency_before => true}.merge(options)
-  
-  # split integer and fractional parts 
+
+  # split integer and fractional parts
   int, frac = ("%.2f" % number).split('.')
   # insert the delimiters
   int.gsub!(/(\d)(?=(\d\d\d)+(?!\d))/, "\\1#{options[:delimiter]}")
-  
+
   if options[:currency_before]
     options[:currency_symbol] + int + options[:decimal_symbol] + frac
   else
     int + options[:decimal_symbol] + frac + options[:currency_symbol]
   end
 end
-
-for month in 1..@months.to_i
-	%><li><a href="#<%=month%>">Month: <%=month%></a></li><%
-end
 %>
-</ul>
+<%= partial( "header" ) %>
+<div id="leftcolumn">
+<div class=foo></div>
+<div class=bar>
+<%= partial("monthly_config") %>
 </div>
+<a href=/configs/edit_daily>Edit Weekday Usage Model</a><br />
+<a href=/configs>Add Instance Configuration</a><br />
+
+</div>
+<div id="content">
+<%= partial("month_header") %>
 <% 
 #@dm = DailyModel.first(:name => "#{@index_name}-DailyModel")
 #@ri_counter = 0
@@ -120,7 +106,7 @@ Monthly Growth Chart: <br/>
 <%= partial("spark") %>
 </div>
 <div id="totals">
-<table width=100%><tr><td>
+<table ><tr><td>
 <h1> Totals </h1>
 <b>Total On Demand Price <%= currencify(@unoptimized_price) %></b></br>
 <b>Total Monthly Recurring For <%= @months %> Months:</b> <%=currencify(@m_monthly) %><br/>
@@ -160,6 +146,7 @@ Monthly Growth Chart: <br/>
 %>
 </td></tr>
 </table>
+</div>
 </div>
 <%= partial("detail") %>
 

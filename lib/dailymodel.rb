@@ -23,9 +23,15 @@ class DailyModel
 		
 	end
 	def get_types
-		#if (@ami_types == nil)
+		if (@ami_types == nil)
+			puts "Loading AMI Types from disk"
        			@ami_types = open('ami_types.yaml') { |f| YAML.load(f) }
-		#end
+		elsif (@ami_types.length > 0)
+			puts "Loading AMI Types from disk, Length was zero"
+                        @ami_types = open('ami_types.yaml') { |f| YAML.load(f) }
+		else
+			puts "Pulling AMI Types from Memory"
+		end
 	end
 	def put_hour(hour,usage)
 		if (@temp_hash == nil)

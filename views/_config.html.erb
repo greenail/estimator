@@ -23,7 +23,7 @@ rio_price,first_month_price = @dm.calc_annual_price_with_ri(optimal_ris)
 @m_monthly += first_month_price - rio_install_1y
 %>
 <div class="msg_list">
-<p class="msg_head"><%= config.name.split("-").last %>: details 
+<p class="msg_head"><%= config.name %>: details 
 Optimal Reserved Instances: <%= optimal_ris %><br />
 </p>
 <div class="msg_body">
@@ -32,10 +32,10 @@ Optimal Reserved Instances: <%= optimal_ris %><br />
 <table border=1>
 <tr>
 <center><th colspan=26><%= config.name %>
-         <a href=<%= URI.escape("/configs/edit_config?config_key=#{config.name}") %>>
+         <a href=<%= URI.escape("/configs/edit_config/#{config.id}") %>>
          Edit ---
         </a>
-        <a href="/configs/delete_config?config_key=<%= config.name %>">
+        <a href="/configs/delete_config/<%= config.id %>">
         Delete
         </a>
 	Instance Type: <%= config.type %> 

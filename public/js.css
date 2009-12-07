@@ -4,9 +4,6 @@ display: inline;
 list-style-type: none;
 padding-right: 20px;
 }
-p {
-padding: 0 0 1em;
-}
 .msg_list {
 margin: 0px;
 padding: 0px;
@@ -24,31 +21,81 @@ padding: 5px 10px 15px;
 background-color:#F4F4F8;
 }
 .ex {color:rgb(0,0,255)}
-<!--
- /* Font Definitions */
- @font-face
-	{font-family:"Cambria Math";
-	panose-1:2 4 5 3 5 4 6 3 2 4;}
-@font-face
-	{font-family:Calibri;
-	panose-1:2 15 5 2 2 2 4 3 2 4;}
- /* Style Definitions */
- p.MsoNormal, li.MsoNormal, div.MsoNormal
-	{margin-top:0in;
-	margin-right:0in;
-	margin-bottom:10.0pt;
-	margin-left:0in;
-	line-height:115%;
-	font-size:11.0pt;
-	font-family:"Calibri","sans-serif";}
-.MsoPapDefault
-	{margin-bottom:10.0pt;
-	line-height:115%;}
-@page Section1
-	{size:8.5in 11.0in;
-	margin:1.0in 1.0in 1.0in 1.0in;}
-div.Section1
-	{page:Section1;}
--->
+/*
+
+      Created by CSS Portal Layout Generator
+
+	  
+
+	  http://www.cssportal.com
+
+	  	  
+
+*/
+body {
+    margin:9px 9px 0 9px;
+    padding:0;
+    background:#FFF;
+}
+#wrapper { 
+
+ margin: 0 auto;
+
+ width: 100%;
+
+}
+
+
+
+#content { 
+
+ float: right;
+
+ color: #333;
+
+ background: #FFFFFF;
+
+ height: 900px;
+
+ width: 80%;
+
+ display: inline;
+
+}
+
+.padded table td {
+	padding-left: 50px;
+	}
+
+#header {
+
+ color: #333;
+
+ width: 100%;
+
+ float: left;
+
+ height: 150px;
+
+ background: #FFFFFF;
+
+}
+
+#leftcolumn { 
+
+ color: #333;
+
+ background: #EBE3CD;
+
+ height: 900px;
+
+ width: 20%;
+
+ float: left;
+
+}
+
+
+
 
 

@@ -3,8 +3,6 @@ FIX edit daily model, not sure why save_yaml is not working
 put % values as whole number
 change % to whole number % in daily view
 move number of instances above % utilization
-Need to add bar chart partial
-Add show hide javaascript for month parameters
 Add display for current instance configurations
 Make screen width more usable
 figure out export, may do pdf...
@@ -12,6 +10,8 @@ add chart for number of instances
 add chart for %usage per month
 add chart for each type added, may want toggle to select if this is generated since we may have many instance configs
 change config.name to be web, not ItemName which is <estimate name>-<name>
+
+Fix sdb bug
 
 
 

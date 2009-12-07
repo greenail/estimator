@@ -142,9 +142,10 @@ class Configs < Merb::Controller
         @months = @estimate.months
 	@month_growth_percentage = @estimate.month_growth_percentage
 	@month_start_percentage = @estimate.month_start_percentage
-	@configs = Iconf.all(:name.like => "#{@estimate.name}%")
-	if (@configs.count == 0)
-		#redirect("/configs")
+	#@configs = Iconf.all(:name.like => "#{@estimate.name}%")
+	@configs = @estimate.get_children()
+	if (@configs.length == 0)
+		redirect("/configs")
 	end
 	@e_total_onetime = 0.0
 	@e_total_monthly = 0.0
@@ -167,27 +168,39 @@ class Configs < Merb::Controller
     	render :new_config
   end
   def add_config
-	@estimate_name = cookies[:estimate_name]
+	#@estimate_name = cookies[:estimate_name]
+	@estimate = EstimateModel.get(cookies[:estimate_id])
 	name = params['name']
-	ic = Iconf.create(:name => "#{@estimate_name}-#{name}",:type => params['type'],:min_q => params['min_q'],:max_q => params['max_q'],:days => params['days'],:weekend_usage => params['weekend_usage'])
-	redirect ("/configs/show_estimate/#{cookies[:estimate_id]}")
+	ic = Iconf.create(:name => name,:type => params['type'],:min_q => params['min_q'],:max_q => params['max_q'],:days => params['days'],:weekend_usage => params['weekend_usage'])
+	@estimate.iconfs.push(ic.id)
+	tmp_name = @estimate.name
+	@estimate.name = "fdlsld"
+	@estimate.save
+	@estimate.name = tmp_name
+	@estimate.save
+	redirect ("/configs/show_estimate/#{@estimate.id}")
   end
   def update_config
-        name = params['name']
-	ic = Iconf.first(:name => name)
-        ic.update(:name => name,:type => params['type'],:min_q => params['min_q'],:max_q => params['max_q'],:days => params['days'],:weekend_usage => params['weekend_usage'])
+	@estimate = EstimateModel.get(cookies[:estimate_id])
+	id = params['iconf_id']
+	ic = Iconf.get(id)
+        ic.update(:name => params['name'],:type => params['type'],:min_q => params['min_q'],:max_q => params['max_q'],:days => params['days'],:weekend_usage => params['weekend_usage'])
         redirect ("/configs/show_estimate/#{params['eid']}")
   end
   def delete_config
-	ic = Iconf.first(:name => params['config_key'])
-	ic.destroy
+	@estimate = EstimateModel.get(cookies[:estimate_id])
+	ic = Iconf.get(params['id'])
+	raise NotFound unless ic
+	@estimate.iconfs.delete(ic.id)
+	@estimate.save
+	ic.destroy!
 	redirect ("/configs/show_estimate")
   end
   def edit_config
-	@estimate_name = cookies[:estimate_name]
-	@config_name = params['config_key']
-	@c = Iconf.first(:name =>@config_name)
-	@config = @c.to_hash
+	@id = params['id']
+	@ic = Iconf.get(@id)
+	raise NotFound unless @ic
+	@config = @ic.to_hash
 	render :edit_config
   end
   def edit_daily
@@ -236,11 +249,22 @@ class EstimateModel
 	property :months, Integer, :nullable => false
 	property :month_growth_percentage, String, :nullable => false
 	property :month_start_percentage, String, :nullable => false
+	property :dm, String, :nullable => false
+	property :iconfs, SdbArray
 	# configs is a hash of config names
 	property :configs, Object
 	attr_accessor :configs
+	def get_children
+        	ary = []
+        	for child in self.iconfs
+			ic = Iconf.get(child)
+                	ary.push(ic) if ic
+        	end
+       	 	return ary
+  	end
 	def fratricide  
-		es = Iconf.all(:name.like => "#{@name}%")
+		#es = Iconf.all(:name.like => "#{@name}%")
+		es = self.get_children
 		for e in es
 			puts "deleting instance configs #{e.name}"
 			e.destroy!
