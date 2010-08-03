@@ -72,8 +72,8 @@ for @month in 1..@months.to_i
         	<%
 	end
 	%>
-	Monthly Unoptimized Cost: <%= currencify(@unoptimized_price/12) %><br/>
-	Monthly Optimized Cost: <%= currencify(@total_current_monthly) %><br/>
+	Monthly On Demand Cost: <%= currencify(@unoptimized_price/12) %><br/>
+	Monthly Reserved Instance Optimized Cost: <%= currencify(@total_current_monthly) %><br/>
 	Cumulative Hourly Cost: <%= currencify(@m_monthly) %><br/>
 	Cumulative Reserved Instance cost: <%= currencify(@m_onetime) %><br/>
 	<%
@@ -110,30 +110,34 @@ Monthly Growth Chart: <br/>
 <div id="totals">
 <table ><tr><td>
 <h1> Totals </h1>
-<b>Total On Demand Price <%= currencify(@unoptimized_price) %></b></br>
-<b>Total Monthly Recurring For <%= @months %> Months:</b> <%=currencify(@m_monthly) %><br/>
+<b>Total On Demand Price <%= currencify(@unoptimized_price) %></b><br>
+<b>Total Monthly Recurring For <%= @months %> Months:</b> <%=currencify(@m_monthly) %><br>
 <b>Total Reserved Instance Purchase Cost Over <%= @months %> Months: </b><%= currencify(@current_onetime) %><br/>
-<b>Total Reserved Instance Optimized Price <%= currencify(@m_monthly + @current_onetime) %></b></br>
+<b>Total upfront costs: <%= currencify(@current_onetime) %></b><br>
+<b>Total Project cost over <%= @months %> Months: <%= currencify(@m_monthly + @current_onetime) %></b><br>
 <h1> Savings </h1>
 <b>Savings from RI Optimization:  </b><%= currencify(@unoptimized_price - (@m_monthly + @current_onetime)) %><br/>
-<b>Savings from Daily Dynamic Scaling: </b><br/>
+<!-- <b>Savings from Daily Dynamic Scaling: </b><br/> -->
 </td>
 <td>
+<!-- TODO move this chart to details
 <h2>Cost per Month</h2>
 <%
 @data = [{"Optimized" => @rio_history},{"Unoptimized" => @unoptimized_history}]
 %>
-<%= partial("line_chart") %>
+<%= partial("line_chart") %> -->
 <h2>Cumulative Cost</h2>
 <%
 @data = [{"Optimized" => @cumulative_price_history},{"Unoptimized" => @cumulative_unoptimized_history}]
 %>
 <%= partial("line_chart") %>
+<!-- TODO move to details page
 <h2>Monthly less install</h2>
 <%
 @data = [{"Optimized" => @no_install_history},{"Unoptimized" => @unoptimized_history}]
 %>
 <%= partial("line_chart") %>
+-->
 </td></tr>
 <tr>
 <td colspan=2>
