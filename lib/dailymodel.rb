@@ -24,13 +24,13 @@ class DailyModel
 	end
 	def get_types
 		if (@ami_types == nil)
-			puts "Loading AMI Types from disk"
+			puts "Loading AMI Types from disk" if @debug
        			@ami_types = open('ami_types.yaml') { |f| YAML.load(f) }
 		elsif (@ami_types.length == 0)
-			puts "Loading AMI Types from disk, #{@ami_types.length}"
+			puts "Loading AMI Types from disk, #{@ami_types.length}" if @debug
                         @ami_types = open('ami_types.yaml') { |f| YAML.load(f) }
 		else
-			puts "Loading AMI Types from memory, #{@ami_types.length}"
+			puts "Loading AMI Types from memory, #{@ami_types.length}" if @debug
 			@ami_types
 		end
 	end

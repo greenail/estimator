@@ -6,7 +6,7 @@ DM Name: <%= @dm.name %> usage: <%= @usage %> dm id: <%= @dm.id %> config type: 
 
 <%
 # Initialize stuff
-@dm.debug = true
+#@dm.debug = true
 @dm.get_daily_model(config.type,@usage.to_f,config.min_q.to_f,config.max_q.to_f)
 if (@dm.instance_hours <= 0)
 	%> "DM BORKED" <%= @dm.instance_hours %><%
@@ -17,7 +17,7 @@ end
 # TODO:  want to put the config once per iteration instead of all this crap
 #dm.put_config(config)
 optimal_ris = @dm.calc_optimal_ris
-puts "OPTIMAL RIS #{optimal_ris}"
+#puts "OPTIMAL RIS #{optimal_ris}"
 annual_price,first_month_price,rio_install_1y = @dm.calc_annual_price_with_ri(optimal_ris)
 rio_price,first_month_price = @dm.calc_annual_price_with_ri(optimal_ris)
 # TODO: need to figure out difference between previous month's RI purchase if we add an RI.

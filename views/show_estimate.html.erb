@@ -56,7 +56,7 @@ for @month in 1..@months.to_i
 	@current_monthly = 0.0
 	@total_current_monthly = 0.0
 	@usage = @month_start_percentage.to_f + (@month_start_percentage.to_f * @month_growth_percentage.to_f * @month.to_i)
-	puts "USAGE: #{@usage}"
+	#puts "USAGE: #{@usage}"
 	@usage = 1 if (@usage >= 1 )
 	@m_onetime = 0.0
 	@unoptimized_price = 0.0
@@ -88,13 +88,13 @@ for @month in 1..@months.to_i
 	@new_onetime_history[@month] = @new_onetime
 	@price_history[@month] = @m_monthly + @new_onetime
 	@unoptimized_history.push(@unoptimized_price/12)
-	puts "UNOPTIMIZED PRICE this Month #{@unoptimized_price/12}"
+	#puts "UNOPTIMIZED PRICE this Month #{@unoptimized_price/12}"
 	@total_unoptimized_price += @unoptimized_price/12
-	puts "TOTAL UNOPTIMIZED PRICE #{@total_unoptimized_price}"
+	#puts "TOTAL UNOPTIMIZED PRICE #{@total_unoptimized_price}"
 	@cumulative_unoptimized_history.push(@total_unoptimized_price)
 	oh_this_sucks = @cumulative_price_history.last
 	oh_this_sucks = 0 if oh_this_sucks == nil
-	puts "Optimized Price #{@current_monthly} + #{@new_onetime} + #{oh_this_sucks} should = #{@m_monthly + @new_onetime + oh_this_sucks}"
+	#puts "Optimized Price #{@current_monthly} + #{@new_onetime} + #{oh_this_sucks} should = #{@m_monthly + @new_onetime + oh_this_sucks}"
 	@cumulative_price_history.push(@total_current_monthly + @new_onetime + oh_this_sucks)
 	@no_install_history.push(@total_current_monthly)
 	@rio_history.push(@total_current_monthly+ @new_onetime)
@@ -149,8 +149,6 @@ Monthly Growth Chart: <br/>
 </td></tr>
 </table>
 </div>
-</div>
-<div>
 <%= partial("detail") %>
 </div>
 </body>
