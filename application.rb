@@ -299,17 +299,19 @@ class EstimateModel
 	
 	def fratricide  
 		#es = Iconf.all(:name.like => "#{@name}%")
-		es = self.get_children
+		es = self.iconfs
 		for e in es
-			puts "deleting instance configs #{e.name}"
-			e.destroy!
+			iconf = Iconf.get(e)
+			next unless iconf
+			puts "deleting instance configs #{iconf.name}"
+			iconf.destroy!
 		end
-		es = JS::DailyModel.all(:name.like => "#{@name}%")
-		for e in es
-                        puts "deleting daily model #{e.name}"
-                        e.destroy!
-                end
-		puts "good bye cruel world!"
+		es = JS::DailyModel.get(self.id)
+		if (es)
+			puts "deleting daily model #{es.name}"
+        	es.destroy!
+        end
+        puts "good bye cruel world!"
 		self.destroy!
 	end
 end
