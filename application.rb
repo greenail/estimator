@@ -91,20 +91,41 @@ class Estimate  < Merb::Controller
   end
   def create
 	user_name = params['user_name']
-        customer_name = params['customer_name']
-        quote_name =  params['quote_name']
-        estimate_name = "#{user_name}-#{customer_name}-#{quote_name}"
+    customer_name = params['customer_name']
+    quote_name =  params['quote_name']
+    estimate_name = "#{user_name}-#{customer_name}-#{quote_name}"
 	months = params['months']
 	month_start_percentage = params['month_start_percentage']
 	month_growth_percentage = params['month_growth_percentage']
 	cookies[:user_name] = user_name
 	cookies[:estimate_name] = estimate_name
-	@estimate = EstimateModel.create(:name => estimate_name,:months => months,:month_growth_percentage => month_growth_percentage,:month_start_percentage => month_start_percentage)
-	@dm = JS::DailyModel.new
+	@dm = JS::DailyModel.create(:name => "#{estimate_name}-DailyModel")
 	@dm.name = "#{estimate_name}-DailyModel"
 	@dm.save
-	cookies[:estimate_id] = @estimate.id
-	redirect ("/configs/show_estimate/#{@estimate.id}")
+	puts "DM ID: #{@dm.id}"
+	puts "DM name: #{@dm.name}"
+	dm_error = ""
+	if (@dm.errors)
+	   	@dm.errors.each do |e|
+      		dm_error << e.to_s
+      		dm_error << "<br>"
+      	end
+      render "ERROR: saving daily model: #{dm_error}. "
+    end
+    
+	@estimate = EstimateModel.create(:name => estimate_name,:months => months,:month_growth_percentage => month_growth_percentage,:month_start_percentage => month_start_percentage,:dm => @dm.id)
+	puts "Estimate Name: #{@estimate.name}"
+	puts "Estimate DM: #{@estimate.dm}"
+	if (@estimate.errors.size > 0)
+		@estimate.errors.each do |e|
+      		dm_error << e.to_s
+      		dm_error << "<br>"
+      	end
+      render "ERROR: saving new estimate: #{dm_error}. "
+    else
+		cookies[:estimate_id] = @estimate.id
+		redirect ("/configs/show_estimate/#{@estimate.id}")
+	end
     #render
   end
 end
@@ -118,6 +139,13 @@ class Configs < Merb::Controller
 	id = params['id']
 	id = params['eid'] if params['eid']
 	@estimate = EstimateModel.get(id)
+	raise NotFound  unless @estimate
+	@configs = @estimate.iconfs
+	#@configs = @estimate.get_children()
+	
+	if (@configs.length == 0)
+		redirect("/configs")
+	end
 	if (params['months'])
 		@estimate = EstimateModel.get(params['eid'])
 		@estimate.update(:months => params['months'],:month_growth_percentage => params['months_growth_percentage'],:month_start_percentage => params['month_start_percentage'])
@@ -143,42 +171,56 @@ class Configs < Merb::Controller
 	@month_growth_percentage = @estimate.month_growth_percentage
 	@month_start_percentage = @estimate.month_start_percentage
 	#@configs = Iconf.all(:name.like => "#{@estimate.name}%")
-	@configs = @estimate.get_children()
-	if (@configs.length == 0)
-		redirect("/configs")
-	end
+	
 	@e_total_onetime = 0.0
 	@e_total_monthly = 0.0
 	@e_month_1 = 0.0
 	@e_month_n = 0.0
-	#puts "#{@months} #{@month_growth_percentage} #{@month_start_percentage}"
-	dmname = "#{@estimate.name}-DailyModel"
-	@dm = JS::DailyModel.first(:name => dmname)
-	puts "DM Name: #{dmname}"
+	@dm = JS::DailyModel.get(@estimate.dm)
+	
 	# ugly hack
 	if (@dm == nil)
 		sleep 1
-		@dm = JS::DailyModel.first(:name => dmname)
+		puts "sleeping waiting for daily model to persist"
+		@dm = JS::DailyModel.get(@estimate.dm)
 	end
 	raise NotFound  unless @dm != nil
         render
   end
   def index
- 	#@dy = DyModel.new
-    	render :new_config
+ 	   	render :new_config
   end
+  #def error
+  	#render :error
+  #end
   def add_config
-	#@estimate_name = cookies[:estimate_name]
-	@estimate = EstimateModel.get(cookies[:estimate_id])
+  	@estimate = EstimateModel.get(cookies[:estimate_id])
+  	@dm = JS::DailyModel.get(@estimate.dm)
 	name = params['name']
 	ic = Iconf.create(:name => name,:type => params['type'],:min_q => params['min_q'],:max_q => params['max_q'],:days => params['days'],:weekend_usage => params['weekend_usage'])
-	@estimate.iconfs.push(ic.id)
-	tmp_name = @estimate.name
-	@estimate.name = "fdlsld"
+	raise NotFound unless ic
+	ary = @estimate.iconfs
+	ary.push(ic.id)
+	puts "ARY #{ary}"
+	@estimate.iconfs = ary
+	ename = @estimate.name
+	@estimate.name = "crap"
 	@estimate.save
-	@estimate.name = tmp_name
-	@estimate.save
-	redirect ("/configs/show_estimate/#{@estimate.id}")
+	@estimate.name = ename
+	result = @estimate.save
+	puts "Result: #{result}"
+	dm_error = ""
+	if (result == false|| @estimate.errors.size > 0)
+		
+      	@estimate.errors.each do |e|
+      		dm_error << e.to_s
+      	end
+      render "ERROR: saving iconf: #{dm_error}.  <BR>Result was: #{result}"
+    else
+    	redirect("/configs/show_estimate/#{@estimate.id}")
+    end
+	
+	
   end
   def update_config
 	@estimate = EstimateModel.get(cookies[:estimate_id])
@@ -245,23 +287,16 @@ end
 class EstimateModel
 	include DataMapper::Resource
 	property :id,Serial
-	property :name, String, :nullable => false
-	property :months, Integer, :nullable => false
-	property :month_growth_percentage, String, :nullable => false
-	property :month_start_percentage, String, :nullable => false
-	property :dm, String, :nullable => false
-	property :iconfs, SdbArray
+	property :name, String, :required=>true
+	property :months, Integer, :required=>true
+	property :month_growth_percentage, String, :required=>true
+	property :month_start_percentage, String, :required=>true
+	property :dm, String, :required=>true
+	property :iconfs, SdbArray, :lazy => false
 	# configs is a hash of config names
 	property :configs, Object
 	attr_accessor :configs
-	def get_children
-        	ary = []
-        	for child in self.iconfs
-			ic = Iconf.get(child)
-                	ary.push(ic) if ic
-        	end
-       	 	return ary
-  	end
+	
 	def fratricide  
 		#es = Iconf.all(:name.like => "#{@name}%")
 		es = self.get_children
@@ -281,13 +316,13 @@ end
 class Iconf
 	# this is the instance configuration
 	include DataMapper::Resource
-        property :id,Serial
-	property :name, String, :nullable => false	
-	property :type, String, :nullable => false
-        property :min_q, String, :nullable => false
-        property :max_q, String, :nullable => false
-        property :days, String, :nullable => false
-        property :weekend_usage, String, :nullable => false
+    property :id,Serial
+	property :name, String, :required=>true	
+	property :type, String, :required=>true
+    property :min_q, String, :required=>true
+    property :max_q, String, :required=>true
+    property :days, String, :required=>true
+    property :weekend_usage, String, :required=>true
 	attr_accessor :week_hours,:rio_total,:rio_total_hourly,:rio_count,:od_total,:instance_hours,:od_peak_month,:rio_total_1y,:rio_total_3y,:rio_install_1y,:rio_install_3y
 	#property :config, Object
 	def to_hash

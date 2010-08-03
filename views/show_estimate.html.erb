@@ -1,3 +1,5 @@
+<%= message[:notice] %>
+<%= message[:error] %>
 <%
 def currencify(number, options={})
   # :currency_before => false puts the currency symbol after the number
@@ -29,8 +31,6 @@ end
 <div id="content">
 <%= partial("month_header") %>
 <% 
-#@dm = DailyModel.first(:name => "#{@index_name}-DailyModel")
-#@ri_counter = 0
 @newmonth_ri_counter = 0
 @lastmonth_ri_counter = 0
 @ri_history = {0 => 0}
@@ -64,7 +64,9 @@ for @month in 1..@months.to_i
 	<div id="<%=@month%>">
 	<b>Month <%= @month %></b><br/>
 	<%
-	for config in @configs
+	for iconf in @configs
+			config = Iconf.get(iconf)
+			next unless config
         	%>
         	<%= partial("config",:with => config) %>
         	<%
@@ -148,7 +150,8 @@ Monthly Growth Chart: <br/>
 </table>
 </div>
 </div>
+<div>
 <%= partial("detail") %>
-
+</div>
 </body>
 </html>

@@ -1,3 +1,10 @@
+<%
+if (message[:notice] || message[:error])
+  	message.inspect
+  %>
+    <div id=notice><%= message[:notice] %></div>
+    <div id=error><%= message[:error] %></div>
+   <% end %>
 <%= partial("header") %>
 Add a new Config
 <hr />

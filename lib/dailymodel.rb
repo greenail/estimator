@@ -5,8 +5,8 @@ module JS
 class DailyModel
         include DataMapper::Resource
         property :id,Serial
-        property :name, String, :nullable => false
-        property :yaml, String, :nullable => false
+        property :name, String, :required=>true	
+        property :yaml, Text, :required=>true, :lazy=>false
  	attr_accessor :usage,:max_instances,:model_min,:day,:ami_type,:model_max,:ami_types,:instance_hours,:weekend_days,:weekend_usage,:ri_one_time,:temp_hash,:debug
 		
 
@@ -26,11 +26,12 @@ class DailyModel
 		if (@ami_types == nil)
 			puts "Loading AMI Types from disk"
        			@ami_types = open('ami_types.yaml') { |f| YAML.load(f) }
-		elsif (@ami_types.length > 0)
-			puts "Loading AMI Types from disk, Length was zero"
+		elsif (@ami_types.length == 0)
+			puts "Loading AMI Types from disk, #{@ami_types.length}"
                         @ami_types = open('ami_types.yaml') { |f| YAML.load(f) }
 		else
-			puts "Pulling AMI Types from Memory"
+			puts "Loading AMI Types from memory, #{@ami_types.length}"
+			@ami_types
 		end
 	end
 	def put_hour(hour,usage)
@@ -63,16 +64,13 @@ class DailyModel
 		# dm.day[hour].usage
 		hs = {}
 		if (@yaml != nil)
-			#puts "Loading SimpleDB Model"  if @debug
+			puts "Loading SimpleDB Model" if @debug 
 			hs =  YAML::load(@yaml)
 		end
-		#if (@day.size == 0 && self.yaml == nil)
-			#puts "Loading Default Model"
-			#hs = open('default_daily_usage.yaml') { |f| YAML.load(f) }
-			#@yaml = hs.to_yaml
-			#self.save
-		#end
+		puts "DM: sorting thorugh hours" if @debug
+		raise "could not find hs in DM" unless hs.size > 0
 		hs.sort.each { |k,v|
+			puts "DM: hour k: #{k} v: #{v}" if @debug
 			h = JS::Hour.new
 			hour_usage = (v * @usage)
 			hour_instances = (@model_max * hour_usage).to_f.round
