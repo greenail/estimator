@@ -89,6 +89,58 @@ class DailyModel
 			}
 	end
 	def calc_optimal_ris
+		# TEST Calculates the optimal RI count for a given configuration by bruit force running through each and every possible RI count.
+		# May want to do some logic to predict which way to move the counter based on previous results.
+		# returns optimal RI count as an int
+		
+		annual_unoptimized_price = calc_annual_unoptimiezed_price	
+		optimal_ris = 0
+		best_price = annual_unoptimized_price
+		#iterate from min to max to find best RI number	
+		start_count = (@max_instances/2).to_i
+		if start_count >= 0
+			c = 0
+			last,crap,crap2 = calc_annual_price_with_ri(start_count)
+			puts "Starting with $#{last} for count: #{start_count}" if @debug
+			while (c < @max_instances+1)
+				up,crap,crap2 = calc_annual_price_with_ri(start_count+1)
+				down,crap,crap2 = calc_annual_price_with_ri(start_count-1)
+				puts "\n\tUP: $#{up}\n\tDown: $#{down}\n\tLast: $#{last}\n\t\t#{start_count}" if @debug
+				if (up < down)
+					
+					puts "need to go up." if @debug
+					start_count += 1
+					if (up > last)
+						puts "Found solution #{start_count-1}" if @debug
+						return start_count-1
+					end
+					last = up
+				elsif (down < up)
+					 
+					#puts "need to go down $#{down}  #{start_count}"
+					puts "need to go down.\n\tCurrent: $#{down}\n\tLast: $#{last}\n\t\t#{start_count}" if @debug
+					start_count -= 1
+					if (down > last)
+						puts "Found solution #{start_count+1}" if @debug
+						return start_count+1
+					end
+					last = down
+				else
+					puts "Price is the same!" if @debug
+					c = @max_instances+2
+				end
+				c += 1
+			end
+		else
+			raise "Need to handle this one!" 
+		end	
+		@day.sort.each { |k,hour|
+            rio_price = optimized_ri_price(hour.instances,optimal_ris)
+			hour.rio_price = rio_price
+			}
+		return optimal_ris
+	end
+	def old_calc_optimal_ris
 		# Calculates the optimal RI count for a given configuration by bruit force running through each and every possible RI count.
 		# May want to do some logic to predict which way to move the counter based on previous results.
 		# returns optimal RI count as an int
@@ -106,7 +158,7 @@ class DailyModel
 			end
 		end
 		@day.sort.each { |k,hour|
-                        rio_price = optimized_ri_price(hour.instances,optimal_ris)
+            rio_price = optimized_ri_price(hour.instances,optimal_ris)
 			hour.rio_price = rio_price
 			}
 		return optimal_ris
