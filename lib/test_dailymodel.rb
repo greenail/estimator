@@ -86,7 +86,7 @@ end
 def test_save_daily_model
 	dm = JS::DailyModel.create(:name => "test_get_daily_model")
 	dm.put_hour(0,1)
-	dm.save_yaml
+	dm.save
 	dm.get_daily_model("m1small")
 	usage = dm.day[0].usage
 	assert_equal(1,usage,"testing put_hour method")

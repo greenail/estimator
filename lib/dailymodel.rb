@@ -3,10 +3,10 @@ require 'dm-core'
 require 'yaml'
 module JS
 class DailyModel
-        include DataMapper::Resource
-        property :id,Serial
-        property :name, String, :required=>true	
-        property :yaml, Text, :required=>true, :lazy=>false
+    include DataMapper::Resource
+    property :id,Serial
+    property :name, String, :required=>true	
+    property :yaml, Text, :required=>true, :lazy=>false
  	attr_accessor :usage,:max_instances,:model_min,:day,:ami_type,:model_max,:ami_types,:instance_hours,:weekend_days,:weekend_usage,:ri_one_time,:temp_hash,:debug
 		
 
@@ -20,9 +20,9 @@ class DailyModel
 		@max_instances = 0
 		hs = open('default_daily_usage.yaml') { |f| YAML.load(f) }
                 @yaml = hs.to_yaml
-		
 	end
 	def get_types
+		# Pulls types from disk or memory depenging on initialization.
 		if (@ami_types == nil)
 			puts "Loading AMI Types from disk" if @debug
        			@ami_types = open('ami_types.yaml') { |f| YAML.load(f) }
@@ -35,21 +35,19 @@ class DailyModel
 		end
 	end
 	def put_hour(hour,usage)
+		# Upadates hash of  hour objects
+		
 		if (@temp_hash == nil)
 			@temp_hash = YAML::load(@yaml)
 		end
 		@temp_hash[hour] = usage
-		#tmp_name = @name
-		#@name = "flab"
-		#@name = tmp_name
 		@yaml = @temp_hash.to_yaml
 	end
-	def save_yaml
-		#@yaml = @temp_hash.to_yaml
-		#puts "SAVE_YAML: #{@yaml}" if @debug
-		self.save
-	end
+	
 	def get_daily_model(ami_type,usage = 1,model_min = 0,model_max = 1)
+		# This is the main setup of the model for a given usage
+		# returns nothing 
+		
 		@ami_types = get_types
 		@ami_type = @ami_types[ami_type.to_sym]
 		@usage = usage
@@ -79,7 +77,7 @@ class DailyModel
 				hour_instances = @model_min
 			end
 			# set the peak number of instances
-			#puts "H #{hour_instances} MI #{@max_instances}"
+			puts "H #{hour_instances} MI #{@max_instances}" if @debug
 			if (hour_instances > @max_instances)
 				@max_instances = hour_instances
 			end
@@ -89,10 +87,12 @@ class DailyModel
 			@instance_hours += hour_instances
 			@day[k] = h
 			}
-		#@yaml = @day.to_yaml
-		#self.save
 	end
 	def calc_optimal_ris
+		# Calculates the optimal RI count for a given configuration by bruit force running through each and every possible RI count.
+		# May want to do some logic to predict which way to move the counter based on previous results.
+		# returns optimal RI count as an int
+		
 		annual_unoptimized_price = calc_annual_unoptimiezed_price	
 		optimal_ris = 0
 		best_price = annual_unoptimized_price
@@ -112,6 +112,8 @@ class DailyModel
 		return optimal_ris
 	end
 	def calc_annual_unoptimiezed_price
+		# Calculates annual price to run on demand instances for model growth curves
+		
 		daily_price = @ami_type[:OD_hourly].to_f * @instance_hours	
 		weekend_instances = (@model_max * @weekend_usage).to_f.round
 		if (weekend_instances < @model_min)
@@ -119,24 +121,30 @@ class DailyModel
 		end
 		weekend_price = @ami_type[:OD_hourly].to_f * @weekend_days * weekend_instances * 24
 		weekly_price = (daily_price * (7 - @weekend_days)) + weekend_price	
-		#puts "Weekday Price: #{daily_price}"
-		#puts "Weekend Price: #{weekend_price}"
-		#puts "Weekly Price: #{weekly_price}"
 		annual_price = weekly_price * 52
 	end
 	def optimized_ri_price(instances,ri)
+		# Calculates hourly price based on number of instance for that hour 
+		# and available reserved instances
+		
 		rio_price = 0.0
 		if (instances >= ri)
-                        od_instances =  instances - ri
-                        ri_price = ri * @ami_type[:RI_hourly].to_f
-                        od_price = od_instances * @ami_type[:OD_hourly].to_f
-                        rio_price = ri_price + od_price
-                else
-                        rio_price =  instances * @ami_type[:RI_hourly].to_f
-                end
+            od_instances =  instances - ri
+            ri_price = ri * @ami_type[:RI_hourly].to_f
+            od_price = od_instances * @ami_type[:OD_hourly].to_f
+            rio_price = ri_price + od_price
+        else
+            rio_price =  instances * @ami_type[:RI_hourly].to_f
+        end
 		return rio_price
 	end
 	def calc_annual_price_with_ri(ri)
+		# Calculates annual price given RI count as input
+		# Returns:
+		# 		annual_price: total project cost including RI purchase
+		# 		first_month_price: this is the one time purchase price + the monthly recurring cost with a given model
+		# 		ri_one_time: upfront RI purchase cost
+		
 		daily_rio_price = 0.0
 		print "\n"
 		@day.sort.each { |k,hour|
@@ -146,16 +154,12 @@ class DailyModel
 			# TODO: figure out how to set this for optimal ri instead of for each iteration of optimal ri test
 			#@day[k].rio_price = daily_rio_price
 		}
-		 #print "\n"
 		weekend_instances = (@model_max * @weekend_usage).to_f.round
                 if (weekend_instances < @model_min)
                         weekend_instances = @model_min
                 end
 		weekend_rio_price = @ami_type[:RI_hourly].to_f * weekend_instances * 24 * @weekend_days
 		weekly_price = (daily_rio_price * (7 - @weekend_days)) + weekend_rio_price
-		#puts "Weekday Price: #{daily_rio_price}"
-                #puts "Weekend Price: #{weekend_rio_price}"
-                #puts "Weekly Price: #{weekly_price}"
 		ri_one_time = @ami_type[:RI_y1_install] * ri
 		annual_price = weekly_price * 52 + ri_one_time
 		first_month_price = weekly_price * 4.3333333 + ri_one_time
@@ -163,12 +167,14 @@ class DailyModel
 		return annual_price, first_month_price, ri_one_time
 	end
 	def print_daily_model
+		# debug print method
 		thash = YAML::load(@yaml)
 		thash.sort.each { |k,v|
 			puts "hour: #{k} usage: #{v}"
 			}
 	end
 	def print_day
+		# debug print method
 		for hour in @day.keys.sort
 			i = @day[hour]
 			puts "Hour: #{hour}"	
