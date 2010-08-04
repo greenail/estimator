@@ -7,6 +7,7 @@ controller file.
 test for calculations on pricing live in /lib/test_dailymodel.rb 
 
 TODO: 	need to add 3 year RI
+	1 year RI does not re-up for projections greater than 12 months
 	add languate to say month is week * 4.333333
 	add non-quote language
 	add real usernames/passwords
